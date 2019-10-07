@@ -1,5 +1,6 @@
 import sys
 import json
+import datetime
 
 print("date", "time", "username", "og_poster", sep = "\t")
 
@@ -9,8 +10,16 @@ for tweet in sys.stdin:
     # Use this to get date and time
     # Could consider using location data to identify timezone
     try:
-        date = obj['created_at']
-        time = obj['created_at']
+        dt = obj['created_at'].split(" ")
+        dt_use = datetime.datetime.strptime(dt[1]+dt[2]+dt[5]+" "+dt[3], '%b%d%Y %H:%M:%S')
+        
+        # Round datetime to nearest 15 minutes
+        seconds = (dt_use - dt_use.min).seconds
+        rounded = (seconds+(60*15)/2) // (60*15) * (60*15)
+        dt_use = dt_use + datetime.timedelta(0,rounded-seconds)
+        
+        date = dt_use.date()
+        time = dt_use.time()
     except:
         date = "NA"
         time = "NA"
