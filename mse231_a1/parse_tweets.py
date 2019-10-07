@@ -26,14 +26,12 @@ for tweet in sys.stdin:
     
     # Use to get "name"
     try:
-        #username = obj['user']['name']
         username = obj['user']['screen_name']
     except:
         username = "NA"
     
     # Name of og poster if retweeted
     try:
-        #og_poster = obj['retweeted_status']['user']['name']
         og_poster = obj['retweeted_status']['user']['screen_name']
     except:
         og_poster = "NA"
