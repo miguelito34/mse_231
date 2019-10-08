@@ -5,7 +5,11 @@ import datetime
 print("date", "time", "username", "og_poster", sep = "\t")
 
 for tweet in sys.stdin:
-    obj = json.loads(tweet)
+    
+    try: 
+        obj = json.loads(tweet)
+    except:
+        continue
     
     # Use this to get date and time
     # Could consider using location data to identify timezone
@@ -26,13 +30,13 @@ for tweet in sys.stdin:
     
     # Use to get "name"
     try:
-        username = obj['user']['screen_name']
+        username = obj['user']['name']
     except:
         username = "NA"
     
     # Name of og poster if retweeted
     try:
-        og_poster = obj['retweeted_status']['user']['screen_name']
+        og_poster = obj['retweeted_status']['user']['name']
     except:
         og_poster = "NA"
         
