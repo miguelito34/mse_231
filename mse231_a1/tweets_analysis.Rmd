@@ -1,0 +1,35 @@
+---
+title: "tweet_analysis"
+author: "Michael Spencer"
+date: "10/7/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+### Libraries
+```{r}
+library(tidyverse)
+```
+
+###  Parameters
+```{r}
+all_tweets_pathname <- "all_tweets_clean 2.tsv"
+filtered_tweets_pathname <- "filtered_tweets_clean.tsv"
+```
+
+## Load Data
+```{r}
+all_tweets <-
+  all_tweets_pathname %>%
+  read_tsv(quote = " ")
+
+filtered_tweets <-
+  filtered_tweets_pathname %>% 
+  read_tsv()
+```
+
