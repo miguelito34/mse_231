@@ -47,9 +47,77 @@ male_names <-
 
 ### find_gender function
 
-This function will make an educated guess on the 
-```{r}
+Here we do simple string manipulation to try and clear the names of any numbers and emojis under the assumption that first names only include alpha characters. Once we have isolated estimated first names we join our tweet data with our
+gender data so that we can attempt to guess the gender of users.
 
+We make an educated guess by determining which gender a name occurs with more. The formula used is (M(x) - F(x))/(M(x) + F(x)). For names present in the data, this gives us a number from -1 to 1, with -1 indicating female, 0 indicating unkown, and 1 indicating male.
+```{r}
+find_gender <- function(data) {
+  
+  data %>% 
+  
+    # String manipulation to isolate first names
+    mutate_if(
+      is.character, 
+      str_replace_all,
+      pattern = "[^[:alpha:]+[:space:]]", 
+      replacement = ""
+    ) %>% 
+    mutate_if(
+      is.character,
+      str_extract,
+      pattern = "^[:alpha:]+"
+    ) %>%
+    mutate_if(
+      is.character,
+      str_to_lower
+    ) %>%
+    
+    # Gives each row a unique key so that they can later be brought back
+    # togther
+    mutate(pair_key = as.integer(rownames(.))) %>% 
+    
+    # Gathers the names to minimize the amount of processing needed when
+    # inferring gender, connects each name to counts, and infers gender
+    gather(key = "user_type", value = "name", username, og_poster) %>%
+    left_join(male_names, by = "name") %>% 
+    left_join(female_names, by = "name") %>% 
+    mutate_at(
+      vars(contains("total")),
+      replace_na,
+      replace = 0
+    ) %>% 
+    mutate(
+      gender_p = (total_male - total_female)/(total_male + total_female),
+      est_gender = case_when(
+        gender_p < 0 ~ "female",
+        gender_p == 0 ~ sample(c("female", "male"), replace = TRUE, size = 1),
+        gender_p > 0 ~ "male",
+        TRUE ~ "unknown"
+      )
+    ) %>% 
+    select(-total_male, -total_female) %>% 
+    
+    # Collects new data and then spreads it out so that further analysis can be
+    # done, keeping interacting pairs together
+    unite(col = "info", name, gender_p, est_gender) %>% 
+    spread(key = "user_type", value = "info") %>%
+    separate(
+      username, 
+      into = c("user_name", "user_gender_p", "user_est_gender"), 
+      sep = "_"
+    ) %>% 
+    separate(
+      og_poster, 
+      into = c("og_name", "og_gender_p", "og_est_gender"), 
+      sep = "_"
+    ) %>% 
+    select(
+      date, time, user_name, og_name, user_est_gender, og_est_gender,
+      user_gender_p, og_gender_p
+    )
+
+}
 ```
 
 
@@ -78,39 +146,22 @@ male_names <-
   filter(year >= 1928 & year <= 2014) %>% 
   mutate(name = name %>% str_to_lower()) %>% 
   group_by(name) %>% 
-  summarise(total = sum(count, na.rm = TRUE))
+  summarise(total_male = sum(count, na.rm = TRUE))
 
 female_names <-
   female_names %>% 
   filter(year >= 1928 & year <= 2014) %>% 
   mutate(name = name %>% str_to_lower()) %>% 
   group_by(name) %>% 
-  summarise(total = sum(count, na.rm = TRUE))
+  summarise(total_female = sum(count, na.rm = TRUE))
 ```
 
 ### Prep Tweet Data
 
-The tweet data needs some cleaning. Here we do simple string manipulation to
-try and clear the names of any numbers under the assumption that first names
-only include alpha characters.
+We use the *find_gender( )* function written above to prep our tweet data for homophily and time analysis.
 ```{r}
-filtered_tweets %>% 
-  head(100) %>% 
-  mutate_if(
-    is.character, 
-    str_replace_all,
-    pattern = "[^[:alpha:]+[:space:]]", 
-    replacement = ""
-  ) %>% 
-  mutate_if(
-    is.character,
-    str_extract,
-    pattern = "^[:alpha:]+"
-  ) %>%
-  mutate_if(
-    is.character,
-    str_to_lower
-  ) %>% 
-  View()
+filtered_tweets_gen <- find_gender(filtered_tweets)
+all_tweets_gen <- find_gender(all_tweets)
 ```
+
 
