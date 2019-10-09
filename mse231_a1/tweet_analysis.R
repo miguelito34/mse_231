@@ -1,33 +1,17 @@
----
-title: "tweet_analysis"
-author: "Michael Spencer"
-date: "10/7/2019"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ## Setup
 
 ### Libraries
-```{r}
 library(tidyverse)
 library(lubridate)
 library(scales)
-```
 
 ###  Parameters
-```{r}
 all_tweets_pathname <- "all_tweets_clean.tsv"
 filtered_tweets_pathname <- "filtered_tweets_clean.tsv"
 female_names_url <- "https://5harad.com/mse125/assets/hw1/female_names.tsv.gz"
 male_names_url <- "https://5harad.com/mse125/assets/hw1/male_names.tsv.gz"
-```
 
 ## Load Data
-```{r}
 all_tweets <-
   all_tweets_pathname %>%
   read_tsv(quote = " ")
@@ -43,26 +27,14 @@ female_names <-
 male_names <-
   male_names_url %>% 
   read_tsv()
-```
 
 ## Functions
 
 ### find_gender function
-
-Here we do simple string manipulation to try and clear the names of any numbers
-and emojis under the assumption that first names only include alpha characters.
-Once we have isolated estimated first names we join our tweet data with our
-gender data so that we can attempt to guess the gender of users.
-
-We make an educated guess by determining which gender a name occurs with more.
-The formula used is (M(x) - F(x))/(M(x) + F(x)). For names present in the data,
-this gives us a number from -1 to 1, with -1 indicating female, 0 indicating
-unkown, and 1 indicating male.
-```{r}
 find_gender <- function(data) {
   
   data %>% 
-  
+    
     # String manipulation to isolate first names
     mutate_if(
       is.character, 
@@ -124,31 +96,12 @@ find_gender <- function(data) {
       date, time, user_name, og_name, user_est_gender, og_est_gender,
       user_gender_p, og_gender_p
     )
-
+  
 }
-```
-
 
 ## Data Prep
 
 ### Prep Gender Data
-
-Assigning twitter users to a given gender using only their names requires a
-statistical strategy. In the code below, I'll do just that by determining, for
-a given name, whether it is more likely to be male or female. Much of this
-computation will be done in the following steps once we identify the users
-first name, but the first step is to identify the range of years we would like
-to use before aggregating the total count of each name for each gender.
-
-Let's assume that no twitter user is older than 90 (let's face it, not many 90
-year olds are tech savvy). Let's also assume that no one younger than 5 is
-Tweeting.
-
-This means our Twitter users are between 5 and 90, and were thus born between
-1928 and 2014. I'll filter out data to reflect that, while simultaneously
-aggregating the names and making them lowercase (to ensure our matching of
-twitter users' names is robust to capitalization).
-```{r}
 male_names <-
   male_names %>% 
   filter(year >= 1928 & year <= 2014) %>% 
@@ -162,27 +115,16 @@ female_names <-
   mutate(name = name %>% str_to_lower()) %>% 
   group_by(name) %>% 
   summarise(total_female = sum(count, na.rm = TRUE))
-```
 
 ### Prep Tweet Data
-
-We use the *find_gender( )* function written above to prep our tweet data for homophily and time analysis.
-
-This approach is limited in that it assumes first names appear first in
-multi-element strings; is implementing a simple binary classifer (of sorts)
-which is not guaranteed to be perfect; and we also have no way of classifying
-names with non-english characters.
-```{r}
 filtered_tweets_gen <- find_gender(filtered_tweets)
 all_tweets_gen <- find_gender(all_tweets)
-```
 
 ## Analysis
 
 ### Gender Trends Over Time
 
-*Tweet Volume by Gender for All Tweets*
-```{r}
+#### Tweet Volume by Gender for All Tweets
 all_tweets_plot <-
   all_tweets_gen %>% 
   filter(user_est_gender != "unknown") %>% 
@@ -216,16 +158,10 @@ all_tweets_plot <-
   )
 
 all_tweets_plot
-```
 
-```{r}
 ggsave(plot = all_tweets_plot, file = "all_tweets_plot.pdf", width = 8, height = 5)
-```
 
-
-*Tweet Volume by Gender for Tweets About Greta Thunberg*
-```{r}
-
+#### Tweet Volume by Gender for Tweets About Greta Thunberg
 filtered_tweets_plot <-
   filtered_tweets_gen %>% 
   filter(user_est_gender != "unknown") %>% 
@@ -259,27 +195,12 @@ filtered_tweets_plot <-
   )
 
 filtered_tweets_plot
-```
 
-```{r}
 ggsave(plot = filtered_tweets_plot, file = "filtered_tweets_plot.pdf", width = 8, height = 5)
-```
 
 ### Homophily
 
-*Gender Homophily in All Tweets*
-
-Our goal here is to see if users of one gender retweet users of the same gender
-more often than they do users of a opposite gender. To test this we will use
-a test similar to the one used above, in which the formula is:
-
-(retweets of males - retweets of females)/(total retweets)
-
-This formula will return a value from -1 to 1, with -1 indicating that females
-were retweeted more and 1 indicating that males were retweeted more. Gender
-homophily is evident if females get a negative score and males get a positive
-score, with more polarized scores indicating more extreme homophily.
-```{r}
+#### Gender Homophily in All Tweets
 all_tweets_gen %>% 
   filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>% 
   count(user_est_gender, og_est_gender, name = "total") %>% 
@@ -289,10 +210,8 @@ all_tweets_gen %>%
     homophily = ifelse(bias < 0, "female", "male"),
     male_likelihood = (male - female)/male
   )
-```
 
-*Gender Homophily in Tweets About Greta Thunberg*
-```{r}
+#### Gender Homophily in Tweets About Greta Thunberg
 filtered_tweets_gen %>% 
   filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>% 
   count(user_est_gender, og_est_gender, name = "total") %>% 
@@ -302,4 +221,3 @@ filtered_tweets_gen %>%
     homophily = ifelse(bias < 0, "female", "male"),
     male_likelihood = (male - female)/male
   )
-```
