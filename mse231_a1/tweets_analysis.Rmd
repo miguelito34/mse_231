@@ -14,11 +14,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Libraries
 ```{r}
 library(tidyverse)
+library(lubridate)
+library(scales)
 ```
 
 ###  Parameters
 ```{r}
-all_tweets_pathname <- "all_tweets_clean.tsv"
+all_tweets_pathname <- "all_tweets_clean_24hrs.tsv"
 filtered_tweets_pathname <- "filtered_tweets_clean.tsv"
 female_names_url <- "https://5harad.com/mse125/assets/hw1/female_names.tsv.gz"
 male_names_url <- "https://5harad.com/mse125/assets/hw1/male_names.tsv.gz"
@@ -47,10 +49,15 @@ male_names <-
 
 ### find_gender function
 
-Here we do simple string manipulation to try and clear the names of any numbers and emojis under the assumption that first names only include alpha characters. Once we have isolated estimated first names we join our tweet data with our
+Here we do simple string manipulation to try and clear the names of any numbers
+and emojis under the assumption that first names only include alpha characters.
+Once we have isolated estimated first names we join our tweet data with our
 gender data so that we can attempt to guess the gender of users.
 
-We make an educated guess by determining which gender a name occurs with more. The formula used is (M(x) - F(x))/(M(x) + F(x)). For names present in the data, this gives us a number from -1 to 1, with -1 indicating female, 0 indicating unkown, and 1 indicating male.
+We make an educated guess by determining which gender a name occurs with more.
+The formula used is (M(x) - F(x))/(M(x) + F(x)). For names present in the data,
+this gives us a number from -1 to 1, with -1 indicating female, 0 indicating
+unkown, and 1 indicating male.
 ```{r}
 find_gender <- function(data) {
   
@@ -60,17 +67,17 @@ find_gender <- function(data) {
     mutate_if(
       is.character, 
       str_replace_all,
-      pattern = "[^[:alpha:]+[:space:]]", 
+      pattern = "[^[:alpha:]+[:space:]]", # Gets rid of non-alpha characters
       replacement = ""
     ) %>% 
     mutate_if(
       is.character,
       str_extract,
-      pattern = "^[:alpha:]+"
+      pattern = "^[:alpha:]+" # Extracts first string
     ) %>%
     mutate_if(
       is.character,
-      str_to_lower
+      str_to_lower # Normalizes names to lowercase for easier joining
     ) %>%
     
     # Gives each row a unique key so that they can later be brought back
@@ -78,7 +85,8 @@ find_gender <- function(data) {
     mutate(pair_key = as.integer(rownames(.))) %>% 
     
     # Gathers the names to minimize the amount of processing needed when
-    # inferring gender, connects each name to counts, and infers gender
+    # inferring gender, connects each name to counts, and infers gender based
+    # on the formula explained above
     gather(key = "user_type", value = "name", username, og_poster) %>%
     left_join(male_names, by = "name") %>% 
     left_join(female_names, by = "name") %>% 
@@ -98,8 +106,8 @@ find_gender <- function(data) {
     ) %>% 
     select(-total_male, -total_female) %>% 
     
-    # Collects new data and then spreads it out so that further analysis can be
-    # done, keeping interacting pairs together
+    # Collects newly created data and then spreads it out so that further
+    # analysis can be done, keeping interacting user pairs together
     unite(col = "info", name, gender_p, est_gender) %>% 
     spread(key = "user_type", value = "info") %>%
     separate(
@@ -121,7 +129,7 @@ find_gender <- function(data) {
 ```
 
 
-## Analysis
+## Data Prep
 
 ### Prep Gender Data
 
@@ -159,9 +167,61 @@ female_names <-
 ### Prep Tweet Data
 
 We use the *find_gender( )* function written above to prep our tweet data for homophily and time analysis.
+
+This approach is limited in that it assumes first names appear first in
+multi-element strings; is implementing a simple binary classifer (of sorts)
+which is not guaranteed to be perfect; and we also have no way of classifying
+names with non-english characters.
 ```{r}
 filtered_tweets_gen <- find_gender(filtered_tweets)
 all_tweets_gen <- find_gender(all_tweets)
 ```
 
+## Analysis
+
+### Gender Trends Over Time
+
+Tweet Volume by Gender for All Tweets
+```{r}
+all_tweets_gen %>% 
+  filter(user_est_gender != "unknown") %>% 
+  group_by(user_est_gender, date, time) %>% 
+  count() %>% 
+  arrange(date, time, user_est_gender)
+```
+
+Tweet Volume by Gender for Filtered Tweets
+
+The number of users who's genders were arbitrarily guessed is 47, thus insignificant.
+```{r fig.height=2, fig.width=3}
+filtered_tweets_gen %>% 
+  filter(user_est_gender != "unknown") %>% 
+  group_by(date, time, user_est_gender) %>% 
+  count(name = "tweets") %>% 
+  arrange(date, time, user_est_gender) %>% 
+  ungroup() %>% 
+  transmute(
+    user_est_gender = user_est_gender %>% str_to_title(), 
+    tweets, 
+    datetime = ymd_hms(str_c(date, time))
+  ) %>% 
+  ggplot(aes(datetime, tweets, color = user_est_gender)) +
+  geom_line() +
+  scale_x_datetime(
+    breaks = "3 hours",
+    date_labels = "%b%e %I%p"
+  ) +
+  labs(
+    title = "Tweet Volume by Gender for Filtered Tweets",
+    x = NULL,
+    y = "Tweet Volume",
+    caption = "Data collected from Twitter over 24 hours."
+  ) +
+  theme_minimal() +
+  theme(
+    legend.title = element_blank(),
+    legend.position = "bottom",
+    axis.text.x.bottom = element_text(angle = 45, hjust = 1)
+  )
+```
 
