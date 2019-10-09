@@ -2,7 +2,7 @@
 title: "tweet_analysis"
 author: "Michael Spencer"
 date: "10/7/2019"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -20,7 +20,7 @@ library(scales)
 
 ###  Parameters
 ```{r}
-all_tweets_pathname <- "all_tweets_clean_24hrs.tsv"
+all_tweets_pathname <- "all_tweets_clean.tsv"
 filtered_tweets_pathname <- "filtered_tweets_clean.tsv"
 female_names_url <- "https://5harad.com/mse125/assets/hw1/female_names.tsv.gz"
 male_names_url <- "https://5harad.com/mse125/assets/hw1/male_names.tsv.gz"
@@ -182,7 +182,7 @@ all_tweets_gen <- find_gender(all_tweets)
 ### Gender Trends Over Time
 
 Tweet Volume by Gender for All Tweets
-```{r fig.height=2, fig.width=3}
+```{r}
 all_tweets_plot <-
   all_tweets_gen %>% 
   filter(user_est_gender != "unknown") %>% 
@@ -219,12 +219,12 @@ all_tweets_plot
 ```
 
 ```{r}
-ggsave(plot = all_tweets_plot, file = "all_tweets_plot.pdf", width = 2, height = 3)
+ggsave(plot = all_tweets_plot, file = "all_tweets_plot.pdf", width = 8, height = 5)
 ```
 
 
 Tweet Volume by Gender for Tweets About Greta Thunberg
-```{r fig.height=2, fig.width=3}
+```{r}
 filtered_tweets_plot <-
   filtered_tweets_gen %>% 
   filter(user_est_gender != "unknown") %>% 
@@ -261,7 +261,7 @@ filtered_tweets_plot
 ```
 
 ```{r}
-ggsave(plot = filtered_tweets_plot, file = "filtered_tweets_plot.pdf", width = 2, height = 3)
+ggsave(plot = filtered_tweets_plot, file = "filtered_tweets_plot.pdf", width = 8, height = 5)
 ```
 
 ### Homophily
