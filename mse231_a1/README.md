@@ -12,7 +12,7 @@ After identifying a given user’s prospective first name, I used Social Securit
 
 This approach works in this scenario because there are roughly equivalent numbers of males and females in the SSA provided datasets, meaning that it’s good enough to compare raw volume. A more precise approach would have compared the fraction of males with a name to the fraction of females with that name, as this is more robust to variation in sample sizes. To analyze gender homophily, I analysed the proportion of times a given gender retweeted its own gender. I did this using the following formula for each gender:
 
-omophily score for gender x = ((retweets of males by x) - (retweets of females by x)) \over total retweets by x
+omophily score for gender x = ((retweets of males by x) - (retweets of females by x)) / total retweets by x
 
 This resulted in a number that ranged from -1 to 1 in which -1 indicated only females were retweeted and 1 indicated only males were retweeted. If females received a negative score, or if males received a positive score, then gender homophily exists to some extent. Once genders were assigned to each twitter user in my dataset, I was able to plot the tweet volume by gender, for each set of tweets. The results are below.
 
