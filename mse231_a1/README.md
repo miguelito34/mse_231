@@ -18,6 +18,52 @@ This resulted in a number that ranged from -1 to 1 in which -1 indicated only fe
 
 ### The Results
 
+*Homophily for all tweets*
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Gender </th>
+   <th style="text-align:left;"> Homophily Score </th>
+   <th style="text-align:left;"> Homophily </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;"> .34 </td>
+   <td style="text-align:left;"> Male </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;"> .10 </td>
+   <td style="text-align:left;"> Male </td>
+  </tr>
+</tbody>
+</table>
+
+*Homophily for filtered tweets*
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Gender </th>
+   <th style="text-align:left;"> Homophily Score </th>
+   <th style="text-align:left;"> Homophily </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;"> .07 </td>
+   <td style="text-align:left;"> Male </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;"> -.18 </td>
+   <td style="text-align:left;"> Female </td>
+  </tr>
+</tbody>
+</table>
+
 Both trends below, for all tweets and tweets about Greta, followed a similar pattern. It appears high tweet volumes picked up around 11 AM and continued until midnight, with quieter traffic in the morning hours likely due to users’ sleep schedules.
 
 ![All Tweets](https://github.com/miguelito34/mse_231/blob/master/mse231_a1/all_tweets_plot.jpeg)
