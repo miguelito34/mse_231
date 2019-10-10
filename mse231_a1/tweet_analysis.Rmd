@@ -225,7 +225,6 @@ all_tweets_plot
 ggsave(plot = all_tweets_plot, file = "all_tweets_plot.pdf", width = 8, height = 5)
 ```
 
-
 *Tweet Volume by Gender for Tweets About Greta Thunberg*
 ```{r}
 filtered_tweets_plot <-
