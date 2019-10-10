@@ -2,7 +2,7 @@
 
 ### Overview
 
-The proliferation of social media in today’s world allows for a number of novel social questions to be asked, particularly regarding how users interact on digital platforms. In this project, I explore gender homophily on Twitter by analyzing retweet trends between male and female users. Out of interest, I perform this analysis on two different sets of tweets: the randomly selected stream provided by Twitter and a set filtered for the word “Greta” meant to filter for tweets related to Greta Thunberg, the young environmental activist. Below are my approach and results.
+The proliferation of social media in today’s world allows for a number of novel social questions to be asked, particularly regarding how users interact on digital platforms. In this project, I explore gender homophily on Twitter by analyzing retweet trends between male and female users. Out of interest, I perform this analysis on two different sets of tweets: the randomly selected stream provided by Twitter and a set filtered for the word “Greta” meant to filter for tweets related to Greta Thunberg, the young environmental activist. Below are my approach and results:
 
 ### Approach and Strategy
 
@@ -12,7 +12,7 @@ After identifying a given user’s prospective first name, I used Social Securit
 
 This approach works in this scenario because there are roughly equivalent numbers of males and females in the SSA provided datasets, meaning that it’s good enough to compare raw volume. A more precise approach would have compared the fraction of males with a name to the fraction of females with that name, as this is more robust to variation in sample sizes. To analyze gender homophily, I analysed the proportion of times a given gender retweeted its own gender. I did this using the following formula for each gender:
 
-homophily score for gender x = (retweets of males by x) - (retweets of females by x)/total retweets of x
+$$homophily score for gender x = {(retweets of males by x - retweets of females by x) \over total retweets by x}.$$
 
 This resulted in a number that ranged from -1 to 1 in which -1 indicated only females were retweeted and 1 indicated only males were retweeted. If females received a negative score, or if males received a positive score, then gender homophily exists to some extent. Once genders were assigned to each twitter user in my dataset, I was able to plot the tweet volume by gender, for each set of tweets. The results are below.
 
