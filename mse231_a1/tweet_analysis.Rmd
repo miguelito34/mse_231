@@ -13,8 +13,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Libraries
 ```{r}
+if (!require(tidyverse)) install.packages("tidyverse")
 library(tidyverse)
+if (!require(lubridate)) install.packages("lubridate")
 library(lubridate)
+if (!require(scales)) install.packages("scales")
 library(scales)
 ```
 

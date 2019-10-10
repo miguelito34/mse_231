@@ -1,8 +1,11 @@
 ## Setup
 
 ### Libraries
+if (!require(tidyverse)) install.packages("tidyverse")
 library(tidyverse)
+if (!require(lubridate)) install.packages("lubridate")
 library(lubridate)
+if (!require(scales)) install.packages("scales")
 library(scales)
 
 ###  Parameters
