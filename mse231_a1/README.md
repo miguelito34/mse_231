@@ -1,4 +1,4 @@
-# Gender Homphily on Twitter
+# Gender Homophily on Twitter
 
 ### Overview
 
