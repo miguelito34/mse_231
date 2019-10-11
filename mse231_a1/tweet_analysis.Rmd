@@ -342,7 +342,7 @@ all_homophily_results <-
 knitr::kable(all_homophily_results, format = "markdown", digits = 4)
 ```
 
-For all tweets, females retweet females `r (abs(all_homophily_results[1,6] %>% pull())) * 100`% more than expected than if homophily didn't exist. Male users retweeted male users `r (abs(all_homophily_results[2,6] %>% pull())) * 100`% more than expected than if homophily didn't exist. For both genders, homophily exists to some extent.
+For all tweets, females retweet females `r (abs(all_homophily_results[1,6] %>% pull() %>% round(digits = 4))) * 100`% more than expected than if homophily didn't exist. Male users retweeted male users `r (abs(all_homophily_results[2,6] %>% pull() %>% round(digits = 4))) * 100`% more than expected than if homophily didn't exist. For both genders, homophily exists to some extent.
 
 *Gender Homophily in Tweets About Greta Thunberg*
 

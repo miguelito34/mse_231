@@ -56,7 +56,7 @@ find_gender <- function(data) {
     ) %>%
     
     # Gives each row a unique key so that they can later be brought back
-    # togther
+    # together
     mutate(pair_key = as.integer(rownames(.))) %>% 
     
     # Gathers the names to minimize the amount of processing needed when
@@ -128,6 +128,7 @@ all_tweets_gen <- find_gender(all_tweets)
 ### Gender Trends Over Time
 
 #### Tweet Volume by Gender for All Tweets
+
 all_tweets_plot <-
   all_tweets_gen %>% 
   filter(user_est_gender != "unknown") %>% 
@@ -203,24 +204,54 @@ ggsave(plot = filtered_tweets_plot, file = "filtered_tweets_plot.pdf", width = 8
 
 ### Homophily
 
+#### Expectations
+exp_prob <-
+  all_tweets_gen %>% 
+  filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>%
+  count(og_est_gender, name = "total") %>% 
+  mutate(exp_prop = total / sum(total)) %>% 
+  arrange(og_est_gender) %>% 
+  pull(exp_prop)
+
+female_exp <- exp_prob[1]
+male_exp <- exp_prob[2]
+
 #### Gender Homophily in All Tweets
-all_tweets_gen %>% 
-  filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>% 
+all_homophily_results <- 
+  all_tweets_gen %>% 
+  filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>%
   count(user_est_gender, og_est_gender, name = "total") %>% 
   spread(key = "og_est_gender", value = "total") %>% 
+  rename("female_rts" = female, "male_rts" = male) %>% 
   mutate(
-    bias = (male - female)/(male + female),
-    homophily = ifelse(bias < 0, "female", "male"),
-    male_likelihood = (male - female)/male
+    female_act = female_rts / (female_rts + male_rts),
+    male_act = male_rts / (female_rts + male_rts),
+    fem_diff_from_exp = female_act - female_exp,
+    homophily_rt_more = case_when(
+      fem_diff_from_exp < 0 ~ "male",
+      fem_diff_from_exp > 0 ~ "female",
+      TRUE ~ "none"
+    )
   )
 
+knitr::kable(all_homophily_results, format = "markdown", digits = 4)
+
 #### Gender Homophily in Tweets About Greta Thunberg
-filtered_tweets_gen %>% 
-  filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>% 
+filtered_homophily_results <-
+  filtered_tweets_gen %>% 
+  filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>%
   count(user_est_gender, og_est_gender, name = "total") %>% 
   spread(key = "og_est_gender", value = "total") %>% 
+  rename("female_rts" = female, "male_rts" = male) %>% 
   mutate(
-    bias = (male - female)/(male + female),
-    homophily = ifelse(bias < 0, "female", "male"),
-    male_likelihood = (male - female)/male
+    female_act = female_rts / (female_rts + male_rts),
+    male_act = male_rts / (female_rts + male_rts),
+    fem_diff_from_exp = female_act - female_exp,
+    homophily_rt_more = case_when(
+      fem_diff_from_exp < 0 ~ "male",
+      fem_diff_from_exp > 0 ~ "female",
+      TRUE ~ "none"
+    )
   )
+
+knitr::kable(filtered_homophily_results, format = "markdown", digits = 4)
