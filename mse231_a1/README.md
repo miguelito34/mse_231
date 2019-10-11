@@ -23,7 +23,7 @@ Using these two values, I can determine if a given gender shows homophily by tak
  <thead>
   <tr>
    <th style="text-align:left;"> Gender </th>
-   <th style="text-align:left;"> Female Proportion </th>
+   <th style="text-align:left;"> Actual % of RT's of Female Users vs Expected % </th>
    <th style="text-align:left;"> Homophily Exists? </th>
   </tr>
  </thead>
@@ -46,7 +46,7 @@ Using these two values, I can determine if a given gender shows homophily by tak
  <thead>
   <tr>
    <th style="text-align:left;"> Gender </th>
-   <th style="text-align:left;"> Female Proportion </th>
+   <th style="text-align:left;"> Actual % of RT's of Female Users vs Expected % </th>
    <th style="text-align:left;"> Homophily Exists? </th>
   </tr>
  </thead>
