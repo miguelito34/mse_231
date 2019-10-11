@@ -2,7 +2,9 @@
 title: "tweet_analysis"
 author: "Michael Spencer"
 date: "10/7/2019"
-output: html_document
+output: 
+  pdf_document:
+    latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}
@@ -12,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Setup
 
 ### Libraries
-```{r}
+```{r, message=FALSE, warning = FALSE}
 if (!require(tidyverse)) install.packages("tidyverse")
 library(tidyverse)
 if (!require(lubridate)) install.packages("lubridate")
@@ -30,7 +32,7 @@ male_names_url <- "https://5harad.com/mse125/assets/hw1/male_names.tsv.gz"
 ```
 
 ## Load Data
-```{r}
+```{r, message=FALSE, warning = FALSE}
 all_tweets <-
   all_tweets_pathname %>%
   read_tsv(quote = " ")
@@ -57,10 +59,14 @@ and emojis under the assumption that first names only include alpha characters.
 Once we have isolated estimated first names we join our tweet data with our
 gender data so that we can attempt to guess the gender of users.
 
-We make an educated guess by determining which gender a name occurs with more.
-The formula used is (M(x) - F(x))/(M(x) + F(x)). For names present in the data,
-this gives us a number from -1 to 1, with -1 indicating female, 0 indicating
-unkown, and 1 indicating male.
+We make an educated guess about a user's gender by determining which gender a 
+name occurs with more. The formula used is:
+
+$$\frac{males\ with\ name\ x - females\ with\ name\ x}{total\ occurences\ of\ name\ x}$$
+
+For names present in the data, this formula gives us a number from -1 to 1, with -1 indicating 
+female, 0 indicating unkown, and 1 indicating male. If a given names generates a negative number,
+it is assigned female, if 0, unknown, and if a positive number, then male.
 ```{r}
 find_gender <- function(data) {
   
@@ -84,7 +90,7 @@ find_gender <- function(data) {
     ) %>%
     
     # Gives each row a unique key so that they can later be brought back
-    # togther
+    # together
     mutate(pair_key = as.integer(rownames(.))) %>% 
     
     # Gathers the names to minimize the amount of processing needed when
@@ -136,21 +142,20 @@ find_gender <- function(data) {
 
 ### Prep Gender Data
 
-Assigning twitter users to a given gender using only their names requires a
-statistical strategy. In the code below, I'll do just that by determining, for
-a given name, whether it is more likely to be male or female. Much of this
-computation will be done in the following steps once we identify the users
-first name, but the first step is to identify the range of years we would like
-to use before aggregating the total count of each name for each gender.
+Assigning Twitter users to a given gender using only their names requires a
+statistical strategy. Much of this computation will be done in the following 
+steps using the `find_gender()` function, but the first step is to identify
+the range of years we would like to use before aggregating the total count of
+each name for each gender.
 
-Let's assume that no twitter user is older than 90 (let's face it, not many 90
+Let's assume that no Twitter user is older than 90 (let's face it, not many 90
 year olds are tech savvy). Let's also assume that no one younger than 5 is
-Tweeting.
+tweeting.
 
 This means our Twitter users are between 5 and 90, and were thus born between
 1928 and 2014. I'll filter out data to reflect that, while simultaneously
 aggregating the names and making them lowercase (to ensure our matching of
-twitter users' names is robust to capitalization).
+Twitter users' names is robust to capitalization).
 ```{r}
 male_names <-
   male_names %>% 
@@ -169,10 +174,10 @@ female_names <-
 
 ### Prep Tweet Data
 
-We use the *find_gender( )* function written above to prep our tweet data for homophily and time analysis.
+We use the `find_gender()` function written above to prep our tweet data for homophily and time analysis.
 
 This approach is limited in that it assumes first names appear first in
-multi-element strings; is implementing a simple binary classifer (of sorts)
+multi-element strings; it's implementing a simple binary classifer (of sorts)
 which is not guaranteed to be perfect; and we also have no way of classifying
 names with non-english characters.
 ```{r}
@@ -266,41 +271,100 @@ filtered_tweets_plot
 ggsave(plot = filtered_tweets_plot, file = "filtered_tweets_plot.pdf", width = 8, height = 5)
 ```
 
+Both trends above, for all tweets and tweets about Greta, followed a similar pattern.
+It appears high tweet volumes picked up around 11 AM and continued until midnight,
+with quieter traffic in the morning hours likely due to users’ sleep schedules.
+
 ### Homophily
+
+*Expectations*
+
+Our goal here is to see if users of one gender retweet users of the same gender
+disproportionately more often than they do users of a opposite gender. To test 
+this we will use a test similar to the one used above, in which we'll compare
+the expected value to the actual value. The expected value assumes that if no
+homophily exists, a given gender will retweet males and females proportional to their
+occurences in the retweet data (ie, for the set of all retweets, if males represent
+20% of the original posters, then a given gender will retweet males 20% of the time).
+The formulas are as follows:
+
+Expected % of retweets of gender x = $$\frac{\#\ of\ retweets\ of\ gender\ x}{total\ \#\ of\ retweets}$$
+
+Actual % of retweets of gender x by gender y = $$\frac{\#\ of\ retweets\ of\ gender\ x\ by\ y}{total\ \#\ of\ retweets\ by\ y}$$
+
+```{r}
+exp_prob <-
+  all_tweets_gen %>% 
+  filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>%
+  count(og_est_gender, name = "total") %>% 
+  mutate(exp_prop = total / sum(total)) %>% 
+  arrange(og_est_gender) %>% 
+  pull(exp_prop)
+
+female_exp <- exp_prob[1]
+male_exp <- exp_prob[2]
+```
+
+* Expected proportion of female retweets: `r  (female_exp %>% round(digits = 4)) * 100`%
+
+* Expected proportion of male retweets: `r (male_exp %>% round(digits = 4)) * 100`%
 
 *Gender Homophily in All Tweets*
 
-Our goal here is to see if users of one gender retweet users of the same gender
-more often than they do users of a opposite gender. To test this we will use
-a test similar to the one used above, in which the formula is:
+To determine homophily, we calculate the actual proportions separately for each gender.
+We can then compare these actuals with the expected proportions to see if gender homophily exists. Namely, 
+for a given gender, if the actual proportion of females retweeted is less then
+the expected proportion, that gender retweets females less often than expected.
+If this phenomena occured amongst male users, we would say that they demonstrate
+homophily because they are retweeting females less (and thus males more) than expected. 
+The same is true of the converse situation.
 
-(retweets of males - retweets of females)/(total retweets)
-
-This formula will return a value from -1 to 1, with -1 indicating that females
-were retweeted more and 1 indicating that males were retweeted more. Gender
-homophily is evident if females get a negative score and males get a positive
-score, with more polarized scores indicating more extreme homophily.
+In the charts below, if `user_est_gender` and `homophily_rt_more` are the same,
+homophily exist for that gender.
 ```{r}
-all_tweets_gen %>% 
-  filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>% 
+all_homophily_results <- 
+  all_tweets_gen %>% 
+  filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>%
   count(user_est_gender, og_est_gender, name = "total") %>% 
   spread(key = "og_est_gender", value = "total") %>% 
+  rename("female_rts" = female, "male_rts" = male) %>% 
   mutate(
-    bias = (male - female)/(male + female),
-    homophily = ifelse(bias < 0, "female", "male"),
-    male_likelihood = (male - female)/male
+    female_act = female_rts / (female_rts + male_rts),
+    male_act = male_rts / (female_rts + male_rts),
+    fem_diff_from_exp = female_act - female_exp,
+    homophily_rt_more = case_when(
+      fem_diff_from_exp < 0 ~ "male",
+      fem_diff_from_exp > 0 ~ "female",
+      TRUE ~ "none"
+    )
   )
+
+knitr::kable(all_homophily_results, format = "markdown", digits = 4)
 ```
+
+For all tweets, females retweet females `r (abs(all_homophily_results[1,6] %>% pull())) * 100`% more than expected than if homophily didn't exist. Male users retweeted male users `r (abs(all_homophily_results[2,6] %>% pull())) * 100`% more than expected than if homophily didn't exist. For both genders, homophily exists to some extent.
 
 *Gender Homophily in Tweets About Greta Thunberg*
+
 ```{r}
-filtered_tweets_gen %>% 
-  filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>% 
+filtered_homophily_results <-
+  filtered_tweets_gen %>% 
+  filter(user_est_gender != "unknown" & og_est_gender != "unknown") %>%
   count(user_est_gender, og_est_gender, name = "total") %>% 
   spread(key = "og_est_gender", value = "total") %>% 
+  rename("female_rts" = female, "male_rts" = male) %>% 
   mutate(
-    bias = (male - female)/(male + female),
-    homophily = ifelse(bias < 0, "female", "male"),
-    male_likelihood = (male - female)/male
+    female_act = female_rts / (female_rts + male_rts),
+    male_act = male_rts / (female_rts + male_rts),
+    fem_diff_from_exp = female_act - female_exp,
+    homophily_rt_more = case_when(
+      fem_diff_from_exp < 0 ~ "male",
+      fem_diff_from_exp > 0 ~ "female",
+      TRUE ~ "none"
+    )
   )
+
+knitr::kable(filtered_homophily_results, format = "markdown", digits = 4)
 ```
+
+For tweets about Greta Thunberg, female users retweeted female users `r (abs(filtered_homophily_results[1,6] %>% pull() %>% round(digits = 4))) * 100`% more than expected than if homophily didn't exist. Male users retweeted female users `r (abs(filtered_homophily_results[2,6] %>% pull() %>% round(digits = 4))) * 100`% more than expected than if homophily didn't exist. In this case, homophily exists for females and is much stronger than in the standard case above. Meanwhile, for males tweeting about Greta Thunberg, homophily does not exist. These changes are likely due to the topic chosen - Greta Thunberg - and the fact that she is a female environmental activist. Many of those talking about her may be females, and those engaging with tweets about her may also be females. This, in addition to the fact that the likely majority of tweets regarding Greta are posted by female users, makes it easy to understand why we see the results we do.
