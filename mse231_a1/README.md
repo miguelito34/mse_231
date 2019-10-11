@@ -12,11 +12,7 @@ After identifying a given user’s prospective first name, we used Social Securi
 
 This approach works in this scenario because there are roughly equal numbers of males and females in the SSA provided data, meaning that it’s good enough to compare raw volume of names and not proportion, as another analysis might do. To analyze gender homophily, we analysed the actual proportion of times a given gender retweeted its own gender and compared this to the expected proportion if no homophily existed.
 
-![equation](https://latex.codecogs.com/gif.latex?$$\text{Expected&space;%&space;of&space;retweets&space;of&space;gender&space;x&space;=&space;}\frac{\&hash;\&space;of\&space;retweets\&space;of\&space;gender\&space;x}{total\&space;\&hash;\&space;of\&space;retweets}$$" title="$$\text{Expected % of retweets of gender x = }\frac{\#\ of\ retweets\ of\ gender\ x}{total\ \#\ of\ retweets}$$)
-
-$$\text{Expected % of retweets of gender x = }\frac{\#\ of\ retweets\ of\ gender\ x}{total\ \#\ of\ retweets}$$
-
-$$\text{Actual % of retweets of gender x by gender y = }\frac{\#\ of\ retweets\ of\ gender\ x\ by\ y}{total\ \#\ of\ retweets\ by\ y}$$
+![equations](https://github.com/miguelito34/mse_231/blob/master/mse231_a1/homophily_equations.jpeg)
 
 Using these two values, we can determine if a given gender shows homophily by taking the actual proportion for retweets of females (females would be y above) minus the expected proportion. If the result is positive, it means that gender x retweeted females more often than expected. Thus, using this test, homophily is determined by a positive result for females and a negative result for males. We see this in the tables below.
 
