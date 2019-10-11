@@ -1,8 +1,3 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
 # Gender Homophily on Twitter
 
 ### Overview
@@ -11,11 +6,13 @@ The proliferation of social media in today’s world allows for a number of nove
 
 ### Approach and Strategy
 
-To perform this project, we first streamed both random tweets and filtered tweets from the Twitter API for roughly 34 hours. Our filtered tweets included those with the name Greta - a reference to the environmental activist [Greta Thundberg](https://en.wikipedia.org/wiki/Greta_Thunberg). These tweets were streamed in JSON format and were parsed for basic info such as username, retweeted user, date, and time using parse_tweets.py. Once this data was parsed, gender analysis could begin. First, we parsed user’s screen names to identify their prospective first name. In order to do this, we eliminated non-alpha characters such as numbers and emojis, then we extracted the first string in what was remaining under the assumption that this would be the real first name of the majority of users.
+To perform this project, we first streamed both random tweets and filtered tweets from the Twitter API for roughly 34 hours. Our filtered tweets included those with the name Greta - a reference to the environmental activist [Greta Thunberg](https://en.wikipedia.org/wiki/Greta_Thunberg). These tweets were streamed in JSON format and were parsed for basic info such as username, retweeted user, date, and time using parse_tweets.py. Once this data was parsed, gender analysis could begin. First, we parsed user’s screen names to identify their prospective first name. In order to do this, we eliminated non-alpha characters such as numbers and emojis, then we extracted the first string in what was remaining under the assumption that this would be the real first name of the majority of users.
 
 After identifying a given user’s prospective first name, we used Social Security provided baby names data from 1880 and 2013 to infer its gender. We chose to limit our use of this dataset to only names from 1928 forward, as we assumed Twitter users weren’t born prior to this. Next, we aggregated the total occurrences of each unique name and used this to infer a given user’s gender; essentially, for a given user, we asked whether there were more males or females assigned to this name. If there have been historically more males with this name, then we labeled that user as a male, and if not, a female. 
 
 This approach works in this scenario because there are roughly equal numbers of males and females in the SSA provided data, meaning that it’s good enough to compare raw volume of names and not proportion, as another analysis might do. To analyze gender homophily, we analysed the actual proportion of times a given gender retweeted its own gender and compared this to the expected proportion if no homophily existed.
+
+![equation](https://latex.codecogs.com/gif.latex?$$\text{Expected&space;%&space;of&space;retweets&space;of&space;gender&space;x&space;=&space;}\frac{\&hash;\&space;of\&space;retweets\&space;of\&space;gender\&space;x}{total\&space;\&hash;\&space;of\&space;retweets}$$" title="$$\text{Expected % of retweets of gender x = }\frac{\#\ of\ retweets\ of\ gender\ x}{total\ \#\ of\ retweets}$$)
 
 $$\text{Expected % of retweets of gender x = }\frac{\#\ of\ retweets\ of\ gender\ x}{total\ \#\ of\ retweets}$$
 
