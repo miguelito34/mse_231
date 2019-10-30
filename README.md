@@ -9,7 +9,7 @@ We will analyze 311 calls to answer the following question: do we see a higher v
 mkdir <your new directory>
 cd <your new directory>
 git init
-git remote add origin git@github.com:afdocherty/MSnE231-Project.git
+git clone git@github.com:afdocherty/MSnE231-Project.git
 git pull origin master
 (If prompted, Enter your Github Credentials)
 ```
