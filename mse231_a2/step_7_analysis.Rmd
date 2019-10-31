@@ -1,0 +1,337 @@
+---
+title: "Step 8 Analysis"
+author: "Michael Spencer"
+date: "10/25/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+# Load Libraries
+
+if (!require(tidyverse)) install.packages("tidyverse")
+library(tidyverse)
+```
+
+```{r, include=FALSE}
+# Parameters
+
+path_data <- "nyc_taxi_rain.tsv"
+```
+
+```{r, include=FALSE}
+# Load Data
+
+raw_data <-
+	path_data %>% 
+	read_tsv()
+```
+
+## Conclusions
+
+* During busy, rainy hours, average wages decrease by roughly 50 cents. (W1)
+* Despite decreased wages, during busy, rainy hours, the average number of on-duty hours increased (ie more drivers were driving). (S1)
+* Similarly, despite the decreased wages, drivers tended to stay on-duty for a higher proportion of the hour in rainy weather. (S3)
+* The number of passengers appears closely correlated with the supply of taxi drivers in S1. It may be that drivers shift to meet demand in all weather conditions. (D1)
+* The average passenger load is slightly lower in the rain indicating people may be more willing to ride alone in the rain for convenience and speed. (D3)
+* Utilization of taxis is almost always higher in rainy weather. (D4)
+
+## Analysis
+
+### Effect of Rain On Wage
+
+```{r, include=FALSE}
+# Adds proper labels to the data
+
+data <-
+	raw_data %>% 
+		mutate(
+			rained = ifelse(precip == 0, "No Rain", "Rain"),
+			ampm = ifelse(hour >= 12 & hour < 24, "PM", "AM"),
+			new_hour = ifelse(hour > 12 & hour < 24, hour %% 12, hour),
+			new_hour = ifelse(hour == 0, 12, new_hour) %>% as.character(),
+			labs = str_c(new_hour, ampm, sep = "")
+		) %>% 
+		select(-new_hour,-ampm)
+```
+
+```{r, echo=FALSE}
+# Plots the average wage
+
+data %>% 
+	group_by(rained, hour, labs) %>% 
+	summarise(
+		avg_wage = sum(earnings)/sum(t_onduty)
+	) %>% 
+	ggplot(aes(x = hour, y = avg_wage, color = rained)) +
+	geom_line(size = rel(1)) +
+	geom_point(shape = 21, fill = "white") +
+	theme_minimal() +
+	theme(
+		legend.position = "bottom",
+		legend.title = element_blank()
+	) +
+	scale_x_continuous(
+		breaks = seq(0, 24, 2),
+		labels = data %>% filter(hour %% 2 == 0) %>% head(13) %>% pull(labs)
+	) +
+	scale_y_continuous(
+		labels = scales::dollar_format()
+	) +
+	labs(
+		title = "Effects of Rain on the Average Hourly Wage of NYC Taxi Drivers",
+		subtitle = "The average wage seems to be roughly 50 cents lower when it rains.",
+		x = "Hour of Day",
+		y = "Average Hourly Wage in US $",
+		caption = "Figure 4                                        Source: NYC TLC & NOAA"
+	)
+```
+
+The average wage of a driver slightly decreases in rainy hours compared to dry hours, indicating that they may not be incentivized to stay out driving.
+
+
+### Effect of Rain on Supply
+
+```{r, echo=FALSE}
+# Plots the average number of on-duty hours
+
+data %>% 
+	group_by(rained, hour, labs) %>% 
+	summarise(
+		avg_t_onduty = mean(t_onduty, na.rm = TRUE)
+	) %>% 
+	ggplot(aes(x = hour, y = avg_t_onduty, color = rained)) +
+	geom_line(size = rel(1)) +
+	geom_point(shape = 21, fill = "white") +
+	theme_minimal() +
+	theme(
+		legend.position = "bottom",
+		legend.title = element_blank()
+	) +
+	scale_x_continuous(
+		breaks = seq(0, 24, 2),
+		labels = data %>% filter(hour %% 2 == 0) %>% head(13) %>% pull(labs)
+	) +
+	scale_y_continuous(
+		breaks = seq(4000, 30000, 4000),
+		labels = scales::comma_format()
+	) +
+	labs(
+		title = "Effects of Rain on the Average Number On-Duty Hours",
+		subtitle = "The number of on-duty hours seems to decrease during rainy night hours\nbut increase during rainy business hours.",
+		x = "Hour of Day",
+		y = "Average Number On-Duty Hours",
+		caption = "Source: NYC TLC & NOAA"
+	)
+```
+
+The number of on-duty hours seems to decrease during rainy, darker hours but increase during rainy business hours. This implies drivers are driving less in rainy, darker hours and could be due to increased difficulty driving in the rain at night or it could be due to higher demand during daylight hours. From our plot of wages, it doesn't appear as though this increase in on-duty hours during the day is due to increased wages. It could be that the increase in supply is due to a similar increase in demand. We explore this option below.
+
+
+```{r, echo=FALSE}
+# Plots the average number of drivers on-duty hours
+
+data %>% 
+	group_by(rained, hour, labs) %>% 
+	summarise(
+		avg_d_onduty = mean(drivers_onduty, na.rm = TRUE)
+	) %>% 
+	ggplot(aes(x = hour, y = avg_d_onduty, color = rained)) +
+	geom_line(size = rel(1)) +
+	geom_point(shape = 21, fill = "white") +
+	theme_minimal() +
+	theme(
+		legend.position = "bottom",
+		legend.title = element_blank()
+	) +
+	scale_x_continuous(
+		breaks = seq(0, 24, 2),
+		labels = data %>% filter(hour %% 2 == 0) %>% head(13) %>% pull(labs)
+	) +
+	scale_y_continuous(
+		breaks = seq(4000, 30000, 4000),
+		labels = scales::comma_format()
+	) +
+	labs(
+		title = "Effects of Rain on the Average Number On-Duty Drivers",
+		subtitle = "The number of on-duty drivers increases during rainy business hours.",
+		x = "Hour of Day",
+		y = "Average Number On-Duty Drivers",
+		caption = "FIGURE 1                                        Source: NYC TLC & NOAA"
+	)
+```
+
+```{r, echo=FALSE}
+# Plots the average fraction of an hour on-duty
+
+data %>% 
+	group_by(rained, hour, labs) %>% 
+	summarise(
+		avg_t_onduty_per_hour = sum(t_onduty)/sum(drivers_onduty)
+	) %>% 
+	ggplot(aes(x = hour, y = avg_t_onduty_per_hour, color = rained)) +
+	geom_line(size = rel(1)) +
+	geom_point(shape = 21, fill = "white") +
+	theme_minimal() +
+	theme(
+		legend.position = "bottom",
+		legend.title = element_blank()
+	) +
+	scale_x_continuous(
+		breaks = seq(0, 24, 2),
+		labels = data %>% filter(hour %% 2 == 0) %>% head(13) %>% pull(labs)
+	) +
+	scale_y_continuous(
+		labels = scales::percent_format(accuracy = .1)
+	) +
+	labs(
+		title = "Effects of Rain on the Average Fraction of an Hour Spent On-Duty",
+		subtitle = "The average propotion of the hour spent on-duty seemed to increase slightly in\nrainy weather.",
+		x = "Hour of Day",
+		y = "Average Fraction of an Hour Spent On-Duty",
+		caption = "FIGURE 2                                        Source: NYC TLC & NOAA"
+	)
+```
+
+Despite lower wages, drivers seemed to stay on-duty for longer proportions of the hour when it rained compared to when it didn't.
+
+### Effect of Rain on Demand
+
+```{r, echo=FALSE}
+# Plots the average number of passengers in a given hour
+
+data %>% 
+	group_by(rained, hour, labs) %>% 
+	summarise(
+		avg_num_pass = mean(n_pass)
+	) %>% 
+	ggplot(aes(x = hour, y = avg_num_pass, color = rained)) +
+	geom_line(size = rel(1)) +
+	geom_point(shape = 21, fill = "white") +
+	theme_minimal() +
+	theme(
+		legend.position = "bottom",
+		legend.title = element_blank()
+	) +
+	scale_x_continuous(
+		breaks = seq(0, 24, 2),
+		labels = data %>% filter(hour %% 2 == 0) %>% head(13) %>% pull(labs)
+	) +
+	scale_y_continuous(
+		labels = scales::comma_format(accuracy = 1)
+	) +
+	labs(
+		title = "Effects of Rain on the Average Number of Passengers",
+		subtitle = "The number of passengers appears closely correlated with the supply of taxi drivers.\nIt may be likely that drivers shift to meet demand in all weather conditions.",
+		x = "Hour of Day",
+		y = "Average Number of Passengers",
+		caption = "Source: NYC TLC & NOAA"
+	)
+```
+
+As we can see, the average number of passengers getting Taxi rides appears to mirror the demand. The average number decreases in rainy, darker hours, but increased during the day, presumably as more residents and visitors are traveling throughout the city.
+
+
+```{r, echo=FALSE}
+# Plots the average number of trips in a given hour
+
+data %>% 
+	group_by(rained, hour, labs) %>% 
+	summarise(
+		avg_num_trips = mean(n_trip)
+	) %>% 
+	ggplot(aes(x = hour, y = avg_num_trips, color = rained)) +
+	geom_line(size = rel(1)) +
+	geom_point(shape = 21, fill = "white") +
+	theme_minimal() +
+	theme(
+		legend.position = "bottom",
+		legend.title = element_blank()
+	) +
+	scale_x_continuous(
+		breaks = seq(0, 24, 2),
+		labels = data %>% filter(hour %% 2 == 0) %>% head(13) %>% pull(labs)
+	) +
+	scale_y_continuous(
+		labels = scales::comma_format(accuracy = 1)
+	) +
+	labs(
+		title = "Effects of Rain on the Average Number of Taxi Trips Made",
+		subtitle = "The number of trips made appears closely correlated with the\nsupply of taxi drivers.",
+		x = "Hour of Day",
+		y = "Average Number of Taxi Trips Made",
+		caption = "Source: NYC TLC & NOAA"
+	)
+```
+
+Trends in the average number of taxi trips made closely mirrors trends in the average number of passengers. This is to be expected due to the fact that the average trip only carries 1-2 people, which we can see below.
+
+
+```{r, echo=FALSE}
+# Plots the average number of passengers per trip
+
+data %>% 
+	group_by(rained, hour, labs) %>% 
+	summarise(
+		avg_num_trips = sum(n_pass)/sum(n_trip)
+	) %>% 
+	ggplot(aes(x = hour, y = avg_num_trips, color = rained)) +
+	geom_line(size = rel(1)) +
+	geom_point(shape = 21, fill = "white") +
+	theme_minimal() +
+	theme(
+		legend.position = "bottom",
+		legend.title = element_blank()
+	) +
+	scale_x_continuous(
+		breaks = seq(0, 24, 2),
+		labels = data %>% filter(hour %% 2 == 0) %>% head(13) %>% pull(labs)
+	) +
+	labs(
+		title = "Effects of Rain on the Average Passenger Load",
+		subtitle = "The average passenger load is slightly lower in the rain indicating people may\nbe more willing to ride alone in the rain for convenience and speed.",
+		x = "Hour of Day",
+		y = "Average Size of Passenger Load",
+		caption = "Source: NYC TLC & NOAA"
+	)
+```
+
+Interestingly, if we look at the average passenger load for trips in a given hour, we see that loads are slightly smaller in the rain. This could indicate that individuals are more willing to seek out a ride on their own when it is raining, whereas in drier weather they may be more willing to wait and share a ride.
+
+
+```{r, echo=FALSE}
+# Plots average utilization
+
+data %>% 
+	group_by(rained, hour, labs) %>% 
+	summarise(
+		avg_utilization = sum(t_occupied)/sum(t_onduty)
+	) %>% 
+	ggplot(aes(x = hour, y = avg_utilization, color = rained)) +
+	geom_line(size = rel(1)) +
+	geom_point(shape = 21, fill = "white") +
+	theme_minimal() +
+	theme(
+		legend.position = "bottom",
+		legend.title = element_blank()
+	) +
+	scale_x_continuous(
+		breaks = seq(0, 24, 2),
+		labels = data %>% filter(hour %% 2 == 0) %>% head(13) %>% pull(labs)
+	) +
+	scale_y_continuous(
+		labels = scales::percent_format(accuracy = .1)
+	) +
+	labs(
+		title = "Effects of Rain on the Average Utilization NYC Taxi Drivers",
+		subtitle = "Utilization of taxis is almost always higher in rainy weather.",
+		x = "Hour of Day",
+		y = "Average Utilization (time occupied/time on-duty)",
+		caption = "FIGURE 3                                        Source: NYC TLC & NOAA"
+	)
+```
+
+Utilization of taxis in rainy weather almost always increases.
