@@ -35,7 +35,7 @@ In the mapping step, we simply mapped each row by using the date and hour as the
 ### agg_hourly_stats_reduce.py
 In the reducing step, we summed across the fields for each driver in the date-hour, resulting in aggregated values for each date-hour. This finalized data is then used in our analysis.
 
-## Joining and Analysis
+# Joining and Analysis
 Once we had our finalized trip data, we joined it with precipitation data.
 
 ### step_6_join.R
