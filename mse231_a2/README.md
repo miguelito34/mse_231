@@ -1,87 +1,45 @@
-# MSnE231-HW2
+MS&E 231 HW2 README
 
-## I. Steps to replicate Step 3 local test
-1. Clone the repo in a directory of your choosing (I would recommend making one on Farmshare):
-```
-mkdir HW2
-cd HW2
-git init
-git remote add origin https://github.com/afdocherty/MSnE231-HW2.git
-git pull origin master
-(Enter your GitHub credentials)
-```
+# Authors:
+Andrew (Foster) Docherty, Michael Spencer, Jorge Nam
 
-2. Pull the Step 2 data with:
-```
-wget https://5harad.com/data/nyctaxi/2013_trip_data_1.csv.gz 
-wget https://5harad.com/data/nyctaxi/2013_fare_data_1.csv.gz 
-```
+# Objective and approach:
+The current directory includes Python3 scripts that as a whole serve as a solution to converting data on taxi rides in New York City from 2010 to 2013 into aggregated fields of interest on these rides. These fields are then used in our analysis in conversation with Farber and of Camerer et al. on the question of "Why is it so hard to catch a cab in the rain?" Below, we detail how we executed this conversion via three consecutive MapReduce operations.
 
-3. Get only the 1st day (Jan 1st) of the data:
-```
-zcat 2013_fare_data_1.csv.gz | python3 step_2_fare.py > 2013-01-01_fare_data.csv
-zcat 2013_trip_data_1.csv.gz | python3 step_2_trip.py > 2013-01-01_trip_data.csv
-```
+# MapReduce operations (files and brief descriptions):
 
-4. Run the MapReduce job locally:
-```
-cat 2013-01-01_trip_data.csv 2013-01-01_fare_data.csv | python3 join_map.py | sort | python3 join_reduce.py > results_join_reduce_test.csv
-```
+## MapReduce 1: Join and preliminary cleaning
+Given that the relevant NYC taxi data was initially stored in two separate tables, namely the "trip" and "fare" data, we first had to join the datasets into one.
 
-5. Look at the first and last lines of the output file:
-```
-head results_join_reduce_test.csv
-tail results_join_reduce_test.csv
-```
+### join_map.py
+In the mapping step, we use each driver's hack licence (provided on a yearly basis) and the pickup date-time of the trip as the key to uniquely identify trips. The value then was the full data from the original table, as well as a flag indicating which table the row originated from.
 
-6. You can test Part 4 code on this data. For super simple tests, you can make a file with just the head:
-```
-head results_join_reduce_test.csv > results_join_reduce_test_head.csv
-```
+### join_reduce.py
+In the reducing step, we joined the unique data from each row of "trip" and "fare" data into one row. In addition, we applied a number of cleaning operations, such as dropping rows with erroneous data (e.g. coordinates of zero) and correcting any potentially unreliable data (e.g. trip duration in seconds via calculating the time between dropoff and pickup).
 
-8. If you are accessing the fields in each line via `.split(",")`, you can use this mapping of variables to indices (contained in `join_reduce.py`):
-```python
-# Mapping of variables to indices for joined dataset
-MEDALLION_INDEX = 0
-HACK_LICENSE_INDEX = 1
-VENDOR_ID_INDEX = 2
-RATE_CODE_INDEX = 3
-STORE_AND_FWD_FLAG_INDEX = 4
-PICKUP_DATETIME_INDEX = 5
-DROPOFF_DATETIME_INDEX = 6
-PASSENGER_COUNT_INDEX = 7
-TRIP_TIME_IN_SECS_INDEX = 8
-TRIP_DISTANCE_INDEX = 9
-PICKUP_LONGITUDE_INDEX = 10
-PICKUP_LATITUDE_INDEX = 11
-DROPOFF_LONGITUDE_INDEX = 12
-DROPOFF_LATITUDE_INDEX = 13
-PAYMENT_TYPE_INDEX = 14
-FARE_AMOUNT_INDEX = 15
-SURCHARGE_INDEX = 16
-MTA_TAX_INDEX = 17
-TIP_AMOUNT_INDEX = 18
-TOLLS_AMOUNT_INDEX = 19
-TOTAL_AMOUNT_INDEX = 20
-```
+## MapReduce 2: Grouping by date and hour
+Using the joined data, we then grouped by date and hour for each driver to calculate fields of interest for our analysis.
 
-## II. Steps to replicate Step 4 local test after following relevant instructions above
-1. Within the proper directory (i.e where all of the files are), run the following terminal command to save the output (this may take 4-5 minutes):
-```
-cat results_join_reduce_test.csv | ./driver_stats_map.py | sort | ./driver_stats_reduce.py > results_step_4_test.csv
-```
+### driver_stats_map.py
+In the mapping step, we split the data into hours of the day, for example converting a 3:30-4:30pm trip into a 3:30-4pm and 4-4:30pm trip. We also use a dual-key mapping approach by using both the hack license + year and the pickup date-time as keys. The hack license + year key is printed first, used to map and sort the data. We then print a pickup-date time key to be used in the reducer for grouping by date and hour.
 
-## III. Steps to replicate Step 5 local test after following relevant instructions above
-1. Within the proper directory (i.e where all of the files are), run the following terminal command to glimpse the structured output:
-```
-cat results_step_4_test.csv | ./agg_hourly_stats_map.py | sort | ./agg_hourly_stats_reduce.py > results_step_5_test.csv
-```
+### driver_stats_reduce.py
+In the reducing step, we calculate the fields we are interested in for our analysis, namely t_onduty, t_occupied, n_pass, n_trip, n_mile, and earnings. These fields are all relatively simple calculations given the hour-to-hour split from the mapper, with the exception being t_onduty which requires information about adjacent hours.
 
-## IV. Steps to replicate step 6 of the project and join the taxi data with precipitation data
-1. Download the processed data from AWS and ensure the processed taxi data is named `agg_trip_data.csv`
-2. Place the processed data in the project directory
-3. Within the proper directory (i.e the directory you cloned files into), run the following terminal command to execute the join:
-```
-source("step_6_join.R")
-```
-This will create a joined dataset named `nyc_taxi_rain.tsv` in the project directory that includes aggregated hourly taxi data and the relevant precipitation data for that hour.
+## MapReduce 3: Aggregation across drivers
+Finally, on this data grouped by date and hour we performed a simple summation across all of the fields of interest.
+
+### agg_hourly_stats_map.py
+In the mapping step, we simply mapped each row by using the date and hour as the key and the fields as the value.
+
+### agg_hourly_stats_reduce.py
+In the reducing step, we summed across the fields for each driver in the date-hour, resulting in aggregated values for each date-hour. This finalized data is then used in our analysis.
+
+## Joining and Analysis
+Once we had our finalized trip data, we joined it with precipitation data.
+
+### step_6_join.R
+In this joining script, we simply load in the relevant trip and precipitation data, modify the date and hours columns to ensure they can be joined, and join.
+
+### step_7_analysis.pdf
+In this script we explore the effects of rain on wages, supply, and demand. For supply, we used the following metrics: the average number of on-duty hours in a given hour, and the average proportion of the hour drivers spent on-duty.For demand, we explored four metrics: the average hourly number of passengers, the average number of taxi trips, the average number of passengers per trip, and the utilization of taxis in a given hour.
