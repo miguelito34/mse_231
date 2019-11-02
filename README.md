@@ -14,7 +14,7 @@ We will analyze 311 calls to answer the following question: do we see a higher v
 * __scripts__: data-cleaning scripts
 * __reports__: findings to present to others
 
-2. Clone the GitHub repo into a directory of your choosing. You can rename the folder later if you'd like.
+2. Clone the GitHub repo into a directory of your choosing. You can name the directory whatever you'd like.
 ```
 mkdir <your new folder>
 cd <your new folder>
@@ -23,7 +23,7 @@ git remote add origin git@github.com:afdocherty/MSnE231-Project.git
 git pull origin master
 ```
 
-3. The first time you go to push a file, you may recieve this note:
+3. The first time you go to push a file, you may receive this note:
 ```
 fatal: The current branch master has no upstream branch.
 To push the current branch and set the remote as upstream, use
