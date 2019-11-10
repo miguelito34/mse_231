@@ -41,6 +41,17 @@ From now on, anytime you need to make changes, you should be able to push using:
 git push
 ```
 
+4. Make a credentials file
+
+In the project directory, create a new R script called `credentials.R`. Include the following lines with the relevant credentials:
+```
+my_census_api_key <- "<YOUR CENSUS API KEY>"
+```
+
+Follow the relevant links to sign up for any needed credentials you don't already have or cannot supply:
+
+* my_census_api_key: [get API key here](https://api.census.gov/data/key_signup.html)
+
 ### Data
 
 ### Approach and Strategy
