@@ -1,0 +1,14 @@
+.Rhistory
+predictor.vw
+test_predictions.txt
+train_predictions.txt
+training_predictions.txt
+vw_test_data.txt
+vw_training_data.txt
+.DS_Store
+scratch.ipynb
+.ipynb_checkpoints/
+Rplots.pdf
+preds.txt
+vw_hidden_test.txt
+trump_hidden_test.tsv

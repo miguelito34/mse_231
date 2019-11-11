@@ -1,0 +1,209 @@
+---
+title: "HW 3 Model Evaluation"
+output: pdf_document
+---
+
+## Setup
+
+### Load Libraries
+```{r}
+if (!require(tidyverse)) install.packages("tidyverse")
+library(tidyverse)
+if (!require(ROCR)) install.packages("ROCR")
+library(ROCR)
+```
+
+### Parameters
+```{r}
+## file paths
+path_training_data <- "training_data.tsv"
+path_training_preds <- "training_predictions.txt"
+path_test_data <- "test_data.tsv"
+path_test_preds <- "test_predictions.txt"
+
+## threshold
+threshold <- .5
+```
+
+### Load Data
+```{r}
+labels_train <-
+	path_training_data %>%
+	read_tsv(col_names = TRUE) %>%
+	transmute(
+		label = X1
+	)
+
+preds_train <-
+	path_training_preds %>%
+	read_csv(col_names = FALSE) %>%
+	rename(raw_preds = X1)
+
+labels_test <-
+	path_test_data %>% 
+	read_tsv(col_names = TRUE) %>% 
+	transmute(
+		label = X1
+	)
+
+preds_test <-
+	path_test_preds %>% 
+	read_csv(col_names = FALSE) %>% 
+	rename(raw_preds = X1)
+```
+
+### Transform Data
+```{r}
+(data_train <-
+	tibble(
+		labels = labels_train$label,
+		raw_preds = preds_train$raw_preds,
+		preds = ifelse(raw_preds > threshold, "Trump", "Staff")
+	))
+
+(data_test <-
+	tibble(
+		labels = labels_test$label,
+		raw_preds = preds_test$raw_preds,
+		preds = ifelse(raw_preds > threshold, "Trump", "Staff")
+	))
+```
+
+## Evaluation
+
+### Accuracy
+```{r}
+train_acc <- mean(data_train$labels == data_train$preds)
+test_acc <- mean(data_test$labels == data_test$preds)
+print(c("Training Accuracy" = train_acc, "Test Accuracy" = test_acc))
+```
+
+### AUC
+```{r}
+pred_train <- prediction(data_train$raw_preds, data_train$labels)
+perf_train <- performance(pred_train, "auc")
+perf_train_plot <- performance(pred_train, "tpr", "fpr")
+auc_train <- perf_train@y.values[[1]]
+
+pred_test <- prediction(data_test$raw_preds, data_test$labels)
+perf_test <- performance(pred_test, "auc")
+perf_test_plot <- performance(pred_test, "tpr", "fpr")
+auc_test <- perf_test@y.values[[1]]
+
+print(c("Train AUC" = auc_train, "Test AUC" = auc_test))
+```
+
+```{r}
+model_train_perf_data <-
+	tibble(
+		fpr = perf_train_plot@x.values[[1]],
+		tpr = perf_train_plot@y.values[[1]]
+	)
+
+model_test_perf_data <-
+	tibble(
+		fpr = perf_test_plot@x.values[[1]],
+		tpr = perf_test_plot@y.values[[1]]
+	)
+```
+
+```{r}
+model_train_perf_data %>% 
+	ggplot(aes(x = fpr, y = tpr)) +
+	geom_line() +
+	theme_bw() +
+	theme(
+		panel.grid = element_blank()
+	) +
+	labs(
+		title = "Training AUC",
+		x = "True Positive Rate",
+		y = "False Positive Rate"
+	)
+
+model_test_perf_data %>% 
+	ggplot(aes(x = fpr, y = tpr)) +
+	geom_line() +
+	theme_bw() +
+	theme(
+		panel.grid = element_blank()
+	) +
+	labs(
+		title = "Test AUC",
+		x = "True Positive Rate",
+		y = "False Positive Rate"
+	)
+```
+
+### Calibration Plots
+
+Transform data
+```{r}
+data_calib_train <-
+	data_train %>% 
+	mutate(
+		bin_pred = 
+			round(raw_preds/.05) * .05
+	) %>%
+	group_by(bin_pred) %>%
+	summarize(
+		size = n(),
+		model_perc = mean(raw_preds),
+		emp_perc = mean(labels == "Trump")
+	)
+
+data_calib_test <-
+	data_test %>% 
+	mutate(
+		bin_pred = 
+			round(raw_preds/.05) * .05
+	) %>%
+	group_by(bin_pred) %>%
+	summarize(
+		size = n(),
+		model_perc = mean(raw_preds),
+		emp_perc = mean(labels == "Trump")
+	)
+```
+
+Plot data
+```{r}	
+data_calib_train %>% 
+	ggplot(aes(x = model_perc, y = emp_perc, size = size)) +
+	geom_point(alpha = .6) +
+	geom_abline(slope = 1, intercept = 0, linetype = 2) +
+	scale_x_continuous(
+		labels = scales::percent_format()
+	) +
+	scale_y_continuous(
+		labels = scales::percent_format()
+	) +
+	scale_size(
+		breaks = seq(0, 300, 50)
+	) +
+	coord_fixed() +
+	theme_bw() +
+	labs(
+		title = "Training Set Calibration Plot",
+		x = "Model Percentage",
+		y = "Empiral Percentage"
+	)
+
+data_calib_test %>% 
+	ggplot(aes(x = model_perc, y = emp_perc, size = size)) +
+	geom_point(alpha = .6) +
+	geom_abline(slope = 1, intercept = 0, linetype = 2) +
+	scale_x_continuous(
+		labels = scales::percent_format()
+	) +
+	scale_y_continuous(
+		labels = scales::percent_format()
+	) +
+	coord_fixed() +
+	theme_bw() +
+	labs(
+		title = "Test Set Calibration Plot",
+		x = "Model Percentage",
+		y = "Empiral Percentage"
+	)
+```

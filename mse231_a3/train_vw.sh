@@ -1,0 +1,1 @@
+vw -d vw_training_data.txt -f predictor.vw --loss_function logistic --cubic sss -q sc --ngram t2
