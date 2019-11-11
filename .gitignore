@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 credentials.R
+census_data.tsv.gz
+census_data_shapefiles*
