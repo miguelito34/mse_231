@@ -52,6 +52,15 @@ Follow the relevant links to sign up for any needed credentials you don't alread
 
 * my_census_api_key: [get API key here](https://api.census.gov/data/key_signup.html)
 
+### Replication
+
+1. Download the data
+
+To download the relevant census data, assuming you have set up a credentials file, you can run the following command from the project directory:
+```
+source("scripts/census/pull_census_data.R")
+```
+
 ### Data
 
 ### Approach and Strategy
