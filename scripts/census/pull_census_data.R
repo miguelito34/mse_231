@@ -40,7 +40,6 @@ transform_census_data <- function(data, st, cty) {
 			st_fip   = str_sub(geoid, 1L, 2L),
 			cty_fip  = str_sub(geoid, 3L, 5L),
 			trt_fip  = str_sub(geoid, 6L, 11L),
-			bg_fip   = str_sub(geoid, 12L, 12L),
 			state    = st,
 			county   = cty,
 			geometry = st_cast(geometry, "MULTIPOLYGON"),
@@ -76,7 +75,7 @@ for (st in table_geos$state) {
 		
 		this_county <-
 			get_acs(
-				geography = "block group",
+				geography = "tract",
 				variables = table_census_vars,
 				state = st,
 				county = cty,

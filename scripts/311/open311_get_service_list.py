@@ -4,6 +4,9 @@
 import xml.etree.ElementTree as ElementTree
 import requests
 import pandas as pd
+import os
+
+PROJECT_PATH = os.path.dirname(os.path.dirname(os.getcwd()))
 
 DOMAINS = {
     "Bloomington_IN": "bloomington.in.gov/crm",
@@ -31,7 +34,7 @@ def main():
         df_service_names_all = pd.concat([df_service_names_all, df_service_names], axis=1)
 
     df_service_names_all = df_service_names_all.drop(['dummy'], axis=1)
-    df_service_names_all.to_csv('service_names.csv', index=False)
+    df_service_names_all.to_csv((PROJECT_PATH + '/data/311/service_names.csv'), index=False)
 
 if __name__== "__main__":
     main()
