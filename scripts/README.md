@@ -16,4 +16,6 @@ The `311` scripts folder contains the following scripts to aid in pulling 311 ca
 
 * __open311_pull_all_data.py__: This script currently accesses and downloads all 311 requests for 2019 from the cities in the analysis. The relevant data file can be found at `raw_data/311/sample_311_data.tsv`. This will change and grow as analysis continues.
 
-* __get_census_tract.py__: This script streams each 311 request downloaded and determines the census tract that the request occured in by querying Census Geocoding Services. The script is currently slow and further work is needed to accelerate it. Such location determination will aid in later analysis.
+* __get_census_tract_batch.py__: This script batch processes 311 request downloadeds and determines the census tract that the request occured in by determining which census tract the call is within. This script is currently preferred to the streaming script below as it is much faster. Such location determination will aid in later analysis.
+
+* __get_census_tract_stream.py__: This script streams each 311 request downloaded and determines the census tract that the request occured in by querying the FCC Area API. The script is currently a bit slow and further work is needed to accelerate it. Such location determination will aid in later analysis.

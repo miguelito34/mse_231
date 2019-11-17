@@ -66,7 +66,7 @@ The data for this project are pulled from many different sources. You can find a
 
 * __The US Census__: Data was pulled from the [US Census](https://data.census.gov/cedsci/?intcmp=aff_cedsci_banner) via the R package [tidycensus](https://walkerke.github.io/tidycensus/), which allows for easy access to the Census API.
 
-* __Census Geocoding__: The census tract for each 311 request was determined using [Census Geocoding Services](https://www.census.gov/programs-surveys/geography/technical-documentation/complete-technical-documentation/census-geocoder.html).
+* __FCC Geocoding__: The census tract for each 311 request was determined using [FCC Area API](https://geo.fcc.gov/api/census/#!/block/get_block_find).
 
 ### Replication
 
@@ -95,7 +95,7 @@ python3 scripts/311/open311_pull_all_data.py > data_raw/311/sample_311_data.tsv
 
 In order to perform any significant analysis, we must join this call data with census data. We'll be doing this at the level of census tracts. This script will pair each call with it's relevant geoid, allowing us to join the call with census data in later steps. In this step, we discard any calls for which the location cannot be determined by lat/long.
 ```
-python3 scripts/311/get_census_tract.py > data_raw/311/sample_311_data_geoid.tsv
+python3 scripts/311/get_census_tract_batch.py > data_raw/311/sample_311_data_geoid.tsv
 ```
 
 ### Approach and Strategy (To Come)
