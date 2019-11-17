@@ -7,3 +7,5 @@
 .Ruserdata
 credentials.R
 census_data*
+Pipfile
+Pipfile.lock
