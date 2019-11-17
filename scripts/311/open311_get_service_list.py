@@ -6,7 +6,7 @@ import requests
 import pandas as pd
 import os
 
-PROJECT_PATH = os.path.dirname(os.path.dirname(os.getcwd()))
+PROJECT_PATH = os.getcwd()
 
 DOMAINS = {
     "Bloomington_IN": "bloomington.in.gov/crm",
