@@ -88,14 +88,14 @@ python3 scripts/311/open311_get_service_list.py
 
 Adjusts to this step will be made as the quantity of calls available/needed changes. In the future, this step will likely be piped into the following step so as to output a single file that includes the calls as well as their census tracts. To replicate, run the script as below:
 ```
-python3 scripts/311/open311_pull_all_data.py > data_raw/311/sample_311_data.tsv
+python3 scripts/311/open311_pull_all_data.py > data_raw/311/unjoined/sample_311_data.tsv
 ```
 
 4. Locate each call
 
 In order to perform any significant analysis, we must join this call data with census data. We'll be doing this at the level of census tracts. This script will pair each call with it's relevant geoid, allowing us to join the call with census data in later steps. In this step, we discard any calls for which the location cannot be determined by lat/long.
 ```
-python3 scripts/311/get_census_tract_batch.py > data_raw/311/sample_311_data_geoid.tsv
+python3 scripts/311/get_census_tract_batch.py
 ```
 
 ### Approach and Strategy (To Come)
