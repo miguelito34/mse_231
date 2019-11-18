@@ -24,12 +24,15 @@ calls = calls[calls.lat.notnull() & calls.long.notnull()]
 # Creates a spatial dataframe of the calls and their lat/long before joining it with the census data
 gdf = gpd.GeoDataFrame(calls, crs = {'init' :'epsg:4269'}, geometry = [Point(xy) for xy in zip(calls.long, calls.lat)])
 gdf = gdf[gdf.geometry.type == "Point"]
-gdf = gdf[0:100]
+gdf = gdf[0:1]
 located_311_data = sjoin(gdf, census_tracts, how = 'left').drop(['index_right', 'geometry'], axis = 1)
 
 # I have positively no idea why, but running this again seems to be the only way to make this work, major debugging needed, might try in R.
 gdf = gpd.GeoDataFrame(calls, crs = {'init' :'epsg:4269'}, geometry = [Point(xy) for xy in zip(calls.long, calls.lat)])
 gdf = gdf[gdf.geometry.type == "Point"]
-located_311_data = sjoin(gdf, census_tracts, how = 'left').drop(['index_right', 'geometry'], axis = 1)
+located_311_data = sjoin(gdf, census_tracts, how = 'left')
 
+located_311_data.to_file((PROJECT_PATH + '/data_raw/311/joined/sample_311_data_300k_BOS_CHI_SFO_census.shp'))
+
+located_311_data = located_311_data.drop(['index_right', 'geometry'], axis = 1)
 located_311_data.to_csv((PROJECT_PATH + '/data_raw/311/joined/sample_311_data_300k_BOS_CHI_SFO_census.tsv'), sep = "\t", index = False)
