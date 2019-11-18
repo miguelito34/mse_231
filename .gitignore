@@ -1,5 +1,5 @@
-data_raw/unjoined/
-data_raw/joined/sample_311_data_300k*
+/data_raw/unjoined/*
+/data_raw/joined/sample_311_data_300k*
 *.ipynb
 *.ipynb_checkpoints
 *.DS_Store
