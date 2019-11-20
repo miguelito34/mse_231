@@ -88,8 +88,10 @@ python3 scripts/311/open311_get_service_list.py
 
 Adjusts to this step will be made as the quantity of calls available/needed changes. In the future, this step will likely be piped into the following step so as to output a single file that includes the calls as well as their census tracts. To replicate, run the script as below:
 ```
-python3 scripts/311/open311_pull_all_data.py > data_raw/311/unjoined/<name of file>.tsv
+python3 scripts/311/open311_pull_all_data.py > data_raw/311/unjoined/<data_version>.tsv
 ```
+
+The output data will be in `data_raw/311/unjoined/`.
 
 4. Locate each call
 
@@ -99,6 +101,17 @@ Adjustements will need to be made to the script depending on what you name the c
 ```
 python3 scripts/311/get_census_tract_batch.py
 ```
+The output data will be in `data_raw/311/joined/`.
+
+5. Determine categorization for each call
+
+To carry out a substantive analysis, we categorize each service request into various categories such as whether or not it is human focused, whether it is adversarial, etc. Run the command below to run this script.
+
+```
+Rscript scripts/311/find_complaint_categories.R
+```
+
+This script outputs the prepped data to `data/311/<data_version>_clean` and produces both a `.shp` and `.tsv` file to suit your needs.
 
 ### Approach and Strategy (To Come)
 
