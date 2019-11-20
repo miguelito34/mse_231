@@ -1,3 +1,4 @@
+sample_311_data_300k*
 *.ipynb
 *.ipynb_checkpoints
 *.DS_Store
@@ -7,3 +8,5 @@
 .Ruserdata
 credentials.R
 census_data*
+Pipfile
+Pipfile.lock

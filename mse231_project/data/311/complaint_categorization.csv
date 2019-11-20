@@ -1,0 +1,299 @@
+﻿req_name,req_type,city,explain
+Abandoned Vehicle,Human,Bloomington,-
+Accessibility Problem,Non-Human,Bloomington,-
+Animal Control,Non-Human,Bloomington,-
+Biking & Walking,Human,Bloomington,-
+Blocked Sidewalk,Non-Human,Bloomington,-
+Blocked Street,Non-Human,Bloomington,-
+Bus Services (Bloomington Transit),Non-Human,Bloomington,-
+Business,Non-Human,Bloomington,-
+City Performance,Non-Human,Bloomington,-
+Close Calls,Human,Bloomington,Near traffic accidents
+Debris Removal,Non-Human,Bloomington,-
+Drainage or Runoff,Non-Human,Bloomington,-
+Excessive Growth,Non-Human,Bloomington,-
+Fire Hazards,Non-Human,Bloomington,-
+Food Truck Issues,Human,Bloomington,-
+Graffiti,Human,Bloomington,-
+Inaccessible Parking,Non-Human,Bloomington,-
+Leaf Collection,Non-Human,Bloomington,-
+Line of Sight,Non-Human,Bloomington,Something blocking traffic's line of sight
+Other,Other,Bloomington,-
+Parking Meters and Tickets,Non-Human,Bloomington,-
+Parking on Unimproved Surface,Human,Bloomington,-
+Parking Permits,Human,Bloomington,-
+Parks & Playgrounds,Human,Bloomington,-
+Parks & Rec Buildings,Non-Human,Bloomington,-
+Parks & Rec Programs,Non-Human,Bloomington,-
+"Potholes, Other Street Repair",Non-Human,Bloomington,-
+Public Works Projects,Non-Human,Bloomington,-
+Recycling,Non-Human,Bloomington,-
+Report issues with BIRD scooters (black),Human,Bloomington,-
+Report issues with Lime scooters (green),Human,Bloomington,-
+"Scooters, Bike-share and Related Issues",Human,Bloomington,-
+Sewer Problems (Sanitary Sewers),Non-Human,Bloomington,-
+Sewer Problems (Storm Sewers),Non-Human,Bloomington,-
+Sidewalk & Curb Complaints,Non-Human,Bloomington,-
+Sidewalk Requests,Non-Human,Bloomington,-
+Sidewalk Snow Removal,Non-Human,Bloomington,-
+Smoking Violation,Human,Bloomington,-
+Street & Traffic Signs,Non-Human,Bloomington,-
+Street Lights,Non-Human,Bloomington,-
+Street Snow Removal,Non-Human,Bloomington,-
+Taxi Complaints,Human,Bloomington,-
+Temporary Signage w/o permit,Human,Bloomington,-
+Traffic Related Complaints,Human,Bloomington,-
+Traffic Signals,Non-Human,Bloomington,-
+Traffic Suggestions,Human,Bloomington,-
+Trails,Non-Human,Bloomington,-
+Trash,Non-Human,Bloomington,-
+Unsafe Buildings,Non-Human,Bloomington,-
+Utilities Construction,Non-Human,Bloomington,-
+Utilities Yardwork,Non-Human,Bloomington,-
+Water Quality,Non-Human,Bloomington,-
+Water Utility Billing Problems,Non-Human,Bloomington,-
+Water Utility Problems,Non-Human,Bloomington,-
+Website & Mobile Apps Feedback,Non-Human,Bloomington,-
+Yard Waste,Non-Human,Bloomington,-
+Abandoned Bicycle,Human ,Boston,-
+Abandoned Vehicle,Human ,Boston,-
+Broken Park Equipment,Non-Human,Boston,-
+Broken Sidewalk,Non-Human,Boston,-
+Damaged Sign,Non-Human,Boston,-
+Dead Animal Pick-up,Non-Human,Boston,-
+Dead Tree Removal,Non-Human,Boston,-
+Illegal Graffiti,Human ,Boston,-
+Illegal Parking,Human ,Boston,Complaints against human driver
+Litter,Human ,Boston,Complaints against human who litter
+Needle Clean-up,Human ,Boston,Could be biased based on complaints against people using drugs
+New Tree Requests,Non-Human,Boston,-
+Other,Other,Boston,-
+Overflowing Trash Can,Non-Human,Boston,Complaints against trash
+Park Lights,Non-Human,Boston,-
+Pothole,Non-Human,Boston,-
+Residential Trash out Illegally,Human ,Boston,Complaints against human who trashed out
+Rodent Sighting,Non-Human,Boston,-
+Street Lights,Non-Human,Boston,-
+Traffic Signal,Non-Human,Boston,-
+Tree Pruning,Non-Human,Boston,-
+Abandoned Bike,Human,Brookline,-
+Broken Parking Meter,Non-Human,Brookline,-
+Damaged Sign,Non-Human,Brookline,-
+Graffiti,Human,Brookline,-
+Park Playground Equipment,Non-Human,Brookline,-
+Pothole,Non-Human,Brookline,-
+Public Trees,Non-Human,Brookline,-
+Roadway Plowing/Sanding,Non-Human,Brookline,-
+Sidewalk Obstruction/Repair,Non-Human,Brookline,-
+Streetlight,Non-Human,Brookline,-
+Unshoveled Sidewalk,Human,Brookline,brookline requires property owners to maintain their own sidewalks
+Abandoned Motor Vehicles ,Human ,Chicago,-
+"Air Pollution, Odor or Dust Complaint",Human ,Chicago,-
+Aircraft Noise Complaint,Non-Human,Chicago,Noise coming from people living near Airports
+Alley Light Out Complaint,Non-Human,Chicago,-
+Alley Pothole Complaint,Non-Human,Chicago,-
+Alley Sewer Inspection Request,Non-Human,Chicago,-
+Animal In Trap Complaint,Non-Human,Chicago,"Although mainly caused by Humans, it is not a direct complaint against a human"
+Asbestos Complaint,Non-Human,Chicago,-
+Bee/Wasp Removal,Non-Human,Chicago,-
+Bicycle Request/Complaint,Human ,Chicago,"Refers to bycicle theft, abandoned bycicles"
+Blue Recycling Cart,Non-Human,Chicago,-
+Buildings - Boiler Violation,Non-Human,Chicago,-
+Buildings - Electrical Violation,Non-Human,Chicago,-
+Buildings - Elevator Violation,Non-Human,Chicago,-
+Buildings - Furnace Violation,Non-Human,Chicago,-
+Buildings - Plumbing Violation,Non-Human,Chicago,-
+Bungalow Rehab/Purchase Information Request,Non-Human,Chicago,-
+Cab Feedback,Human ,Chicago,-
+Cable TV Complaint,Non-Human,Chicago,-
+City Vehicle Sticker Violation,Non-Human,Chicago,-
+Clean and Green Program Request,Non-Human,Chicago,-
+Clean Vacant Lot Request,Non-Human,Chicago,-
+Construction & Demolition Complaint,Human ,Chicago,Complaints against humans in construction / demolition
+Consumer Fraud Complaint,Human ,Chicago,-
+Consumer Retail Store Complaint,Human ,Chicago,-
+Coyote Interaction Complaint,Non-Human,Chicago,-
+Daycare Center,Human ,Chicago,Usually complaints against humans in daycare center
+Dead Animal Pick-Up Request,Non-Human,Chicago,-
+Dead Bird,Non-Human,Chicago,-
+E-Scooter,Human ,Chicago,-
+Equipment Noise Complaint,Non-Human,Chicago,-
+Extreme Weather Notification,Non-Human,Chicago,-
+Fire Safety Inspection Request,Non-Human,Chicago,-
+Fly Dumping Complaint,Non-Human,Chicago,-
+Garbage Cart Maintenance,Non-Human,Chicago,-
+Gas Station and Storage Tank Complaint,Non-Human,Chicago,Usaully refers to gas leaks 
+Graffiti Removal Request,Non-Human,Chicago,-
+Groceries,Non-Human,Chicago,-
+Health Club,Non-Human,Chicago,-
+Home Buyer Program Info Request,Non-Human,Chicago,-
+Hotel/Motel - Health Department,Non-Human,Chicago,-
+Inaccurate Fuel Pump Complaint,Non-Human,Chicago,-
+Inaccurate Retail Scales Complaint,Non-Human,Chicago,-
+Lead Inspection Request,Non-Human,Chicago,-
+Licensed Pharmaceutical Representative Complaint,Human ,Chicago,-
+Liquor Establishment Complaint,Human ,Chicago,Refers to compalaints agains human in charge of establishment
+Low Water Pressure Complaint,Non-Human,Chicago,-
+Minimum Wage Complaint,Human ,Chicago,-
+Missed Garbage Pick-Up Complaint,Non-Human,Chicago,-
+No Building Permit and Construction Violation,Human ,Chicago,Complaints against humans in construction / demolition
+No Solicitation Complaint,Human ,Chicago,Complaints against humans soliciting
+No Water Complaint,Non-Human,Chicago,-
+Nuisance Animal Complaint,Non-Human,Chicago,-
+Open Fire Hydrant Complaint,Non-Human,Chicago,-
+Operating Without Business License Complaint,Human ,Chicago,Complaint against people running a business
+Outdated Merchandise Complaint,Human ,Chicago,Complaints against human vendor
+Paid Sick Leave Violation,Human ,Chicago,Complaints against human employer
+Pet Wellness Check Request,Human ,Chicago,Complaint against pet-owner
+Porch Inspection Request,Human ,Chicago,Complaint about someone else's property/their mainenance of it
+Pothole in Street Complaint,Non-Human,Chicago,-
+Protected Bike Lane - Debris Removal,Non-Human,Chicago,-
+Public Vehicle/Valet Complaint,Human ,Chicago,Complaints against human driver
+Pushcart Food Vendor Complaint,Human ,Chicago,-
+Recycling Inspection Request,Non-Human,Chicago,-
+Recycling Pick Up,Non-Human,Chicago,-
+Renters and Foreclosure Complaint,Human ,Chicago,-
+Report an Injured Animal,Non-Human,Chicago,-
+Restaurant Complaint,Human ,Chicago,Complaint against service staff/restaurant owners
+Ridesharing Complaint,Human ,Chicago,-
+Rodent Baiting/Rat Complaint,Non-Human,Chicago,-
+Roof and Porch Repair Program,Non-Human,Chicago,-
+Sanitation Code Violation,Human ,Chicago,Complaints against human in charge of Sanitation
+Sewer Cave-In Inspection Request,Non-Human,Chicago,-
+Sewer Cleaning Inspection Request,Non-Human,Chicago,-
+Shared Housing/Vacation Rental Complaint,Human ,Chicago,-
+Sidewalk Cafe Complaint,Human ,Chicago,Complaints against human in charge of Café
+Sidewalk Inspection Request,Non-Human,Chicago,-
+Sign Repair Request - All Other Signs,Non-Human,Chicago,-
+Sign Repair Request - Do Not Enter Sign,Non-Human,Chicago,-
+Sign Repair Request - One Way Sign,Non-Human,Chicago,-
+Sign Repair Request - Residential Permit Parking,Non-Human,Chicago,-
+Sign Repair Request - Stop Sign,Non-Human,Chicago,-
+Smokeless Tobacco at Sports Event Complaint,Human ,Chicago,Complaints against human smoker
+Smoking: Non-Food Establishment,Human ,Chicago,Complaints against human smoker
+Snow Removal - Protected Bike Lane or Bridge Sidewalk,Non-Human,Chicago,-
+Spills or Dumping in Natural Water Ways,Non-Human,Chicago,-
+Stray Animal Complaint,Non-Human,Chicago,-
+Street Cleaning Request,Non-Human,Chicago,-
+Street Light On During Day Complaint,Non-Human,Chicago,-
+Street Light Out Complaint,Non-Human,Chicago,-
+Street Light Pole Damage Complaint,Non-Human,Chicago,-
+Street Light Pole Door Missing Complaint,Non-Human,Chicago,-
+Tanning and Body Art Complaint,Human ,Chicago,Complaints against artist
+Tobacco - General Complaint,Human ,Chicago,Complaints against human smoker
+Tobacco - Sale to Minors Complaint,Human ,Chicago,Complaints against human vendor
+Traffic Signal Out Complaint,Non-Human,Chicago,-
+Tree Debris Clean-Up Request,Non-Human,Chicago,-
+Tree Planting Request,Non-Human,Chicago,-
+Tree Removal Request,Non-Human,Chicago,-
+Tree Trim Request,Non-Human,Chicago,-
+Vacant/Abandoned Building Complaint,Non-Human,Chicago,Complaints against facility
+Vehicle Parked in Bike Lane Complaint,Human ,Chicago,Complaints against human owner of car
+Viaduct Light Out Complaint,Non-Human,Chicago,-
+Vicious Animal Complaint,Non-Human,Chicago,-
+Water in Basement Complaint,Non-Human,Chicago,-
+Water On Street Complaint,Non-Human,Chicago,-
+Weed Removal Request,Non-Human,Chicago,-
+Wire Basket Request,Non-Human,Chicago,-
+Yard Waste Pick-Up Request,Non-Human,Chicago,-
+Abandoned Vehicle (on Street),Human,Peoria,-
+Abandoned Vehicle (Private Property),Human,Peoria,-
+Anonymous Tips,Human,Peoria,-
+Arson Tips,Human,Peoria,-
+"Blocked Street, Alley, Sidewalk",Non-Human,Peoria,-
+Broken Parking Meter,Non-Human,Peoria,-
+Citizen Fire Concern,Non-Human,Peoria,-
+Dead Animal in Street,Non-Human,Peoria,-
+Drainage/Flooding Problems,Non-Human,Peoria,-
+Dumpsters Not Screened,Human,Peoria,People need to screen their dumpsters in this city
+Excessive Growth-Private Property,Human,Peoria,-
+Excessive Growth–Vacant Public Lot,Non-Human,Peoria,-
+Fire Hazards,Non-Human,Peoria,-
+Fire Permit Issue,Human,Peoria,"Regards whether people's homes are in compliance with fire laws, and if brush burning is in compliance with fire law"
+Good Job,Human,Peoria,-
+Graffiti on Private Property,Human,Peoria,-
+Graffiti on Public Property,Human,Peoria,-
+House/Fence in Disrepair,Human,Peoria,-
+Illegal Disposal of Garbage,Human,Peoria,-
+Illegal Drug Activity,Human,Peoria,-
+Illegal Dumping,Human,Peoria,-
+Illegal Home Occupation,Human,Peoria,-
+Illegal Landscaping,Human ,Peoria,-
+Illegal Permanent Signs,Human ,Peoria,-
+Illegal Storage,Human ,Peoria,-
+Illegal Temporary Signs,Human ,Peoria,-
+Inaccessible Parking,Non-Human,Peoria,-
+Mailbox Knocked Down,Human,Peoria,-
+Missed Garbage Pickup,Non-Human,Peoria,-
+Missed Landscape Waste Pickup,Non-Human,Peoria,-
+Missed Recycling Pickup,Non-Human,Peoria,-
+Non-Owner Occupied - Not Registered,Human,Peoria,-
+Open Burning,Human,Peoria,Open burning of yard waste
+Other/Miscellaneous,Other,Peoria,-
+Overflowing City Garbage Can,Non-Human,Peoria,-
+Parking lot in disrepair,Non-Human,Peoria,-
+Parking on Unpaved Surface,Human,Peoria,-
+"Potholes, Street Repair",Non-Human,Peoria,-
+Private Business,Human,Peoria,Report againsta small business
+Rodents,Non-Human,Peoria,-
+Sewer Problems,Non-Human,Peoria,-
+Sidewalk and Curbs,Non-Human,Peoria,-
+Snow Removal Needed,Non-Human,Peoria,-
+Street Lights,Non-Human,Peoria,-
+Taxi Cab,Human,Peoria,-
+Tire Removal,Non-Human,Peoria,-
+Traffic Related Complaints,Human,Peoria,-
+Traffic Signals,Non-Human,Peoria,-
+Trash/Litter,Non-Human,Peoria,-
+Unsafe Structures,Non-Human,Peoria,-
+Visual Obstruction,Non-Human,Peoria,-
+Website and Mobile App Feedback,Non-Human,Peoria,-
+Working Without Building Permit,Human,Peoria,-
+Yard Waste,Human,Peoria,-
+Abandoned Motor Vehicles ,Human ,San Francisco,-
+Blocked Driveway & Illigal Parking,Human ,San Francisco,-
+Blocked Pedestrian Walway ,Human ,San Francisco,-
+Curb & Sidewalk Issues,Non-Human,San Francisco,-
+Damaged Public Property,Non-Human,San Francisco,-
+Encampment,Human ,San Francisco,-
+Flooding & Sewer Issues,Non-Human,San Francisco,-
+Garbage Containers,Non-Human,San Francisco,"Although mainly caused by Humans, it is not a direct complaint against a human"
+Graffiti,Human ,San Francisco,-
+Illegal Postings,Human ,San Francisco,-
+Noise Issue,Human ,San Francisco,-
+Park Requests,Non-Human,San Francisco,-
+Parking & Traffic Sign Repair,Non-Human,San Francisco,-
+Pothole & Street Issues,Non-Human,San Francisco,-
+Street or Sidewalk Cleaning,Non-Human,San Francisco,-
+Streetlight Repair,Non-Human,San Francisco,-
+Tree Maintenance,Non-Human,San Francisco,-
+CE Collection,Other,Boston,
+Illegal Auto Body Shop,Human,Boston,
+Illegal Dumping,Human,Boston,
+Litter Basket Maintenance,Non-Human,Boston,
+Missed Trash or Recycling,Non-Human,Boston,
+Recycling Cart Return,Non-Human,Boston,
+Schedule a Bulk Item Pickup,Non-Human,Boston,
+Sidewalk Cover / Manhole,Non-Human,Boston,
+Sticker Request,Non-Human,Boston,
+Street Light Knock Downs,Non-Human,Boston,
+Abandoned Vehicle Complaint,Human,Chicago,
+Affordable Rental Housing List,Human,Chicago,
+Alley Grading-Unimproved,Non-Human,Chicago,
+Animal Business Complaint,Human,Chicago,
+CDOT Construction Complaints,Non-Human,Chicago,
+Check for Leak,Non-Human,Chicago,
+Crisis Referral,Other,Chicago,
+Fly Dump (Tires),Non-Human,Chicago,
+Missing Lid/Grate/Cover,Non-Human,Chicago,
+Request Water Shut-Off Occupied Building,Non-Human,Chicago,
+Request Water Shut-off Vacant Building,Non-Human,Chicago,
+Shelter Request,Human,Chicago,
+"Sign - Loading or Standing Zone (New Installation, Amendment, Removal)",Human,Chicago,
+Street Paint Marking Maintenance,Non-Human,Chicago,
+Tree Emergency,Non-Human,Chicago,
+Unwanted Animal,Non-Human,Chicago,
+Wildlife Assistance in Living Quarters,Non-Human,Chicago,
+Wire Down,Non-Human,Chicago,
+Blocked Driveway & Illegal Parking,Human,San Francisco,
+Blocked Pedestrian Walkway,Non-Human,San Francisco,

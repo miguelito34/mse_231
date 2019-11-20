@@ -66,7 +66,7 @@ The data for this project are pulled from many different sources. You can find a
 
 * __The US Census__: Data was pulled from the [US Census](https://data.census.gov/cedsci/?intcmp=aff_cedsci_banner) via the R package [tidycensus](https://walkerke.github.io/tidycensus/), which allows for easy access to the Census API.
 
-* __Census Geocoding__: The census tract for each 311 request was determined using [Census Geocoding Services](https://www.census.gov/programs-surveys/geography/technical-documentation/complete-technical-documentation/census-geocoder.html).
+* __FCC Geocoding__: The census tract for each 311 request was determined using [FCC Area API](https://geo.fcc.gov/api/census/#!/block/get_block_find).
 
 ### Replication
 
@@ -88,15 +88,30 @@ python3 scripts/311/open311_get_service_list.py
 
 Adjusts to this step will be made as the quantity of calls available/needed changes. In the future, this step will likely be piped into the following step so as to output a single file that includes the calls as well as their census tracts. To replicate, run the script as below:
 ```
-python3 scripts/311/open311_pull_all_data.py > data_raw/311/sample_311_data.tsv
+python3 scripts/311/open311_pull_all_data.py > data_raw/311/unjoined/<data_version>.tsv
 ```
+
+The output data will be in `data_raw/311/unjoined/`.
 
 4. Locate each call
 
 In order to perform any significant analysis, we must join this call data with census data. We'll be doing this at the level of census tracts. This script will pair each call with it's relevant geoid, allowing us to join the call with census data in later steps. In this step, we discard any calls for which the location cannot be determined by lat/long.
+
+Adjustements will need to be made to the script depending on what you name the call file above. Namely, you'll have to ensure the script reads in the right file. Also change the name of the files written out to correspond.
 ```
-python3 scripts/311/get_census_tract.py > data_raw/311/sample_311_data_geoid.tsv
+python3 scripts/311/get_census_tract_batch.py
 ```
+The output data will be in `data_raw/311/joined/`.
+
+5. Determine categorization for each call
+
+To carry out a substantive analysis, we categorize each service request into various categories such as whether or not it is human focused, whether it is adversarial, etc. Run the command below to run this script.
+
+```
+Rscript scripts/311/find_complaint_categories.R
+```
+
+This script outputs the prepped data to `data/311/<data_version>_clean` and produces both a `.shp` and `.tsv` file to suit your needs.
 
 ### Approach and Strategy (To Come)
 
