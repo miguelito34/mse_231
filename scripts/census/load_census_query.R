@@ -52,10 +52,4 @@ table_census_vars <-
 table_geos <-
 	tibble(
 		state = c("California", "Illinois", "Massachusetts", "Indiana")
-# 		counties = list(
-# 			as.list(c("Marin County", "San Mateo County", "San Francisco County")), 
-# 			as.list(c("Cook County", "Peoria County", "Tazewell County", "Woodford County")), 
-# 			as.list(c("Suffolk County", "Middlesex County", "Norfolk County")),
-# 			as.list(c("Monroe County"))
-		)
 	)

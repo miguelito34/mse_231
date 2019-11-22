@@ -16,6 +16,10 @@ The `311` scripts folder contains the following scripts to aid in pulling 311 ca
 
 * __open311_pull_all_data.py__: This script currently accesses and downloads all 311 requests for 2019 from the cities in the analysis. The relevant data file can be found at `raw_data/311/sample_311_data.tsv`. This will change and grow as analysis continues.
 
-* __get_census_tract_batch.py__: This script batch processes 311 request downloadeds and determines the census tract that the request occured in by determining which census tract the call is within. This script is currently preferred to the streaming script below as it is much faster. Such location determination will aid in later analysis.
+* __get_census_tract_batch.py__: This script batch processes 311 request downloads and determines the census tract that the request occured in by determining which census tract the call is within. This script is currently preferred to the two streaming scripts below as it is much faster for our current scale. Such location determination will aid in later analysis.
 
 * __get_census_tract_stream.py__: This script streams each 311 request downloaded and determines the census tract that the request occured in by querying the FCC Area API. The script is currently a bit slow and further work is needed to accelerate it. Such location determination will aid in later analysis.
+
+* __join_census.py__: This is the streaming alternative to `get_census_tract_batch.py` should a streaming approach be preffered due to scale limitations. This file uses census tracts to match each call with relevant census demographic data.
+
+* __find_complatint_categories.R__: This script cleans and categorizes the joined 311/census data, categorizing calls by whether or not they were human-oriented, adversarial, etc. Ideally, this script is the last before analysis begins meaning any final cleaning should be done here. Categorization of calls was done manually by the team in [Google Sheets](https://docs.google.com/spreadsheets/d/16_G3nBNMg3H88tBs2i8BO1enHWza5p8tyM_giACXvPM/edit?usp=sharing).

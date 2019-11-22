@@ -18,7 +18,7 @@ PROJECT_PATH = os.getcwd()
 census_tracts = gpd.read_file(r'data/census/census_data_shapefiles.shp') # Use this to keep all columns, i.e. if doing things entirely in memory
 
 
-calls = pd.read_csv(r'data_raw/311/unjoined/sample_311_data_300k_BOS_CHI_SFO.tsv', sep = "\t", index_col = 0)
+calls = pd.read_csv(r'data_raw/311/unjoined/sample_311_data_300k_BOS_CHI_SFO.tsv', sep = "\t")
 calls = calls[calls.lat.notnull() & calls.long.notnull()]
 
 # Creates a spatial dataframe of the calls and their lat/long before joining it with the census data
@@ -33,6 +33,3 @@ gdf = gdf[gdf.geometry.type == "Point"]
 located_311_data = sjoin(gdf, census_tracts, how = 'left')
 
 located_311_data.to_file((PROJECT_PATH + '/data_raw/311/joined/sample_311_data_300k_BOS_CHI_SFO_census.shp'))
-
-located_311_data = located_311_data.drop(['index_right', 'geometry'], axis = 1)
-located_311_data.to_csv((PROJECT_PATH + '/data_raw/311/joined/sample_311_data_300k_BOS_CHI_SFO_census.tsv'), sep = "\t", index = False)

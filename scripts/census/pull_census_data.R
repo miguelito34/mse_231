@@ -41,7 +41,6 @@ transform_census_data <- function(data, st) { # add back in county if needed
 			cty_fip  = str_sub(geoid, 3L, 5L),
 			trt_fip  = str_sub(geoid, 6L, 11L),
 			state    = st,
-			#county = cty
 			geometry = st_cast(geometry, "MULTIPOLYGON"),
 			pop_tot  = pop_total,
 			pop_wht  = pop_num_white/pop_total,
@@ -68,22 +67,17 @@ transform_census_data <- function(data, st) { # add back in county if needed
 data_census <- tibble() %>% data.table::as.data.table()
 
 for (st in table_geos$state) {
-	
-	#counties <- table_geos %>% filter(state == st) %>% pull(counties) %>% unlist()
-	
-	#for (cty in counties) {
-		
+
 		this_state <-
 			get_acs(
 				geography = "tract",
 				variables = table_census_vars,
 				state = st,
-				#county = cty,
 				year = 2015,
 				geometry = TRUE
 			) %>% 
 			select(-moe) %>% 
-			transform_census_data(st) %>% # add back in county if needed
+			transform_census_data(st) %>%
 			data.table::as.data.table()
 			
 		# Appends data for all counties together into single table
@@ -100,4 +94,4 @@ data_census %>%
 
 data_census %>%
 	st_drop_geometry() %>%
-	write_tsv(path = "./data/census/census_data.tsv.gz")
+	write_tsv(path = "./data/census/census_data.tsv")
