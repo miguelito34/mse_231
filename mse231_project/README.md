@@ -111,7 +111,15 @@ To carry out a substantive analysis, we categorize each service request into var
 Rscript scripts/311/find_complaint_categories.R
 ```
 
+6. Perform final cleaning and prepping of the data. This will write out the relevant files. If you wish to re-run analysis, you should skip this step and run the analysis script below, which auto-runs the cleaning script. 
+
+```
+Rscript scripts/311/final_clean.R
+```
+
 This script outputs the prepped data to `data/311/<data_version>_clean` and produces both a `.shp` and `.tsv` file to suit your needs.
+
+7. Replicate the analysis (To Come)
 
 ### Approach and Strategy (To Come)
 
