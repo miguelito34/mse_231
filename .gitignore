@@ -1,3 +1,4 @@
+CHI_data_census*
 CHI_data.tsv
 sample_311_data_300k*
 *.ipynb
@@ -11,3 +12,4 @@ credentials.R
 census_data*
 Pipfile
 Pipfile.lock
+.httr-oauth
