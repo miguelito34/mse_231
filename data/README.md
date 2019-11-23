@@ -14,7 +14,7 @@ After running the relevant scripts per the in the project README, the `311` data
 
 * __service_names.csv__: A temporary list, by city, of the 311 service requests that can be made used to get a sense of the data.
 
-* __complaint_categorization.csv__: A full list of all services available in the data that was used in the analysis. It is constantly updated and pulled from a collaborative [Google Sheet](https://docs.google.com/spreadsheets/d/16_G3nBNMg3H88tBs2i8BO1enHWza5p8tyM_giACXvPM/edit?usp=sharing). Prior to running the analysis, ensure you have the latest sheet downloaded. The determinations in this sheet were subjective, but vetted by the entire team. Categories can be found below:
+* __complaint_categorization.csv__: A full list of all services available in the data that was used in the analysis. It is constantly updated and pulled from a collaborative [Google Sheet](https://docs.google.com/spreadsheets/d/16_G3nBNMg3H88tBs2i8BO1enHWza5p8tyM_giACXvPM/edit?usp=sharing). This sheet will be automatically downloaded when running any of the analysis scripts, though you may need to give the `googlesheets4` package authentication. The determinations in this sheet were subjective, but vetted by the entire team. Categories can be found below:
     * _Request (`req_name`)_: The raw name of the possible requests in the data.
     * _Request aim (`req_aim`)_: This denotes the target of the request, whether a human (themselves, their actions, or their belongings) or a non-human entity.
     * _Legality of the event/concern reported (`legal`)_: This denotes whether or not the reported incident/concern regards a potentially illegal matter such as illegal graffiti, trash dumping, parking, etc.

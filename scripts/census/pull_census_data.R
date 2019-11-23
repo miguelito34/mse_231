@@ -59,7 +59,7 @@ transform_census_data <- function(data, st) { # add back in county if needed
 			ed_as    = ed_as/ed_total,
 			ed_hs    = (ed_hs_college_nf + ed_hs_ged + ed_hs_hs + ed_hs_some_college)/ed_total,
 			ed_l_hs  = 1 - (ed_grad + ed_bs + ed_as + ed_hs),
-			med_inc  = med_income
+			med_inc  = med_income,
 		)
 }
 
@@ -77,13 +77,33 @@ for (st in table_geos$state) {
 				geometry = TRUE
 			) %>% 
 			select(-moe) %>% 
-			transform_census_data(st) %>%
+			transform_census_data(st)
+		
+		match_vars <-
+			get_acs(
+				geography = "tract",
+				variables = c(med_val = "DP04_0089", med_ren = "DP04_0134"),
+				state = st,
+				year = 2015
+			) %>% 
+			select(-moe) %>%
+			group_by(NAME) %>%
+			spread(key = variable, value = estimate) %>%
+			ungroup() %>% 
+			transmute(
+				geoid = GEOID,
+				med_val,
+				med_ren
+			)
+			
+		this_state <- 
+			this_state %>% 
+			left_join(match_vars, by = "geoid") %>% 
 			data.table::as.data.table()
 			
 		# Appends data for all counties together into single table
 		data_census <- data.table::rbindlist(list(data_census, this_state))
 
-	#}
 }
 
 data_census <- data_census %>% st_sf()
