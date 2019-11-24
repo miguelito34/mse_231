@@ -15,11 +15,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 project_dir <- here::here()
 data_name <- "CHI_data_census"
+data_city <- "CHI"
 ```
 
 ### Parameters
 ```{r}
-write_my_files <- "yes" # If you'd like to write out a .shp and .tsv file, use "yes", otherwise "no".
+write_my_files <- "no" # If you'd like to write out a .shp and .tsv file, use "yes", otherwise "no".
 ```
 
 ### Sourcing and Libraries
@@ -42,7 +43,46 @@ source(paste0(project_dir, "/scripts/311/final_clean.R"))
 ```
 
 ## Analysis
+
+What is the distribution of call by topic?
 ```{r}
+data_calls %>% 
+	count(city, topic, sort = TRUE)
+
+data_calls %>% 
+	count(city, topic, sort = TRUE) %>% 
+	mutate(
+		prop = n/sum(n),
+		topic = topic %>% fct_inorder() %>% fct_rev()
+	) %>% 
+	head(10) %>% 
+	ggplot(aes(x = topic, y = prop)) +
+	geom_point() +
+	coord_flip() +
+	scale_y_continuous(labels = scales::percent_format()) +
+	labs(
+		title = "Most Frequent Request Topics",
+		x = "Request Topic",
+		y = "Proportion of Total Requests"
+	)
+```
+
+Within each topic, what are the most frequent services requested?
+```{r}
+data_props <- 
+	data_calls %>% 
+	group_by(city, topic, srvc_nm) %>% 
+	summarize(total_service = n()) %>% 
+	mutate(
+		total_topic = sum(total_service),
+		service_prop_topic = (total_service/total_topic) %>% round(digits = 3)
+	) %>%
+	ungroup() %>% 
+	mutate(topic_prop_all = total_topic/sum(total_service) %>% round(digits = 3)) %>% 
+	arrange(desc(total_topic), desc(total_service)) %>% 
+
+data_props %>% View()
+
 
 ```
 

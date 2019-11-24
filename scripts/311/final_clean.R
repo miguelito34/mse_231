@@ -10,6 +10,7 @@ if (!exists("project_dir")) {
 	
 	project_dir <- here::here()
 	data_name <- "CHI_data_census"
+	data_city <- "CHI"
 	
 	if (!require(sf)) install.packages("sf")
 	library(sf)
@@ -64,33 +65,103 @@ rectify_columns <- function(df) {
 # Write out if requested. Can be requested either by calling this script directly from the terminal
 # or indicating such in the analysis scripts.
 if (!exists("write_my_files")) {
+	print("Writing out the shapefiles of the entire dataset that you requested...")
+	
 	data %>%
 		rename_data %>% 
 		rectify_columns() %>% 
-		st_write(paste0("data/311/", data_name,".shp"), delete_layer = TRUE)	
+		st_write(paste0(project_dir, "/data/311/", data_city, "/", data_name,".shp"), delete_layer = TRUE)
+	
+	print("Shapefiles written!")
 } else if (write_my_files == "yes") {
+	print("Writing out the shapefiles of the entire dataset that you requested...")
+	
 	data %>%
 		rename_data %>%
 		rectify_columns() %>%
-		st_write(paste0("data/311/", data_name,".shp"), delete_layer = TRUE)	
+		st_write(paste0(project_dir, "/data/311/", data_city, "/", data_name,".shp"), delete_layer = TRUE)
+	
+	print("Shapefiles written!")
 }
 
 data <-
 	data %>% 
 	rename_data() %>%
-	rectify_columns() %>%
-	st_drop_geometry()
+	rectify_columns()
+	
+data_write <-
+	data %>% 
+	st_drop_geometry() 
 
 ## For mapbox (testing)
 # geojson_list(data, lat = lat, lon = long) %>% 
 # 	geojson_write(file = "data/311/", data_name,"_mapbox.geojson")
 
 if (!exists("write_my_files")) {
-	data %>% 
-		write_tsv(paste0("data/311/", data_name,".tsv"))	
+	print("Writing out tsv of entire dataset that you requested...")
+	
+	data_write %>% 
+		write_tsv(paste0(project_dir, "/data/311/", data_city, "/", data_name,".tsv"))
+	
+	print("TSV written!")
 } else if (write_my_files == "yes") {
-	data %>% 
-		write_tsv(paste0("data/311/", data_name,".tsv"))
+	print("Writing out tsv of entire dataset that you requested...")
+	
+	data_write %>% 
+		write_tsv(paste0(project_dir, "/data/311/", data_city, "/", data_name,".tsv"))
+	
+	print("TSV written!")
 }
 
-rm("write_my_files", "rename_data", "rectify_columns")
+print(paste0("Preparing your ", data_city, " data for easy analysis..."))
+
+# NOTE: This is a bit inefficient and we should consider holding off on joining all
+# the descriptive data until here (We have been joining it the locating script).
+data_descriptive <-
+	data_write %>% 
+	select(
+		geoid,
+		detail,
+		contains("fip"),
+		state,
+		starts_with("pop"),
+		starts_with("emp"),
+		starts_with("ed"),
+		starts_with("med")
+	) %>% 
+	distinct(geoid, .keep_all = TRUE) %>% 
+	group_by(geoid) %>% 
+	mutate(id = row_number()) %>% 
+	left_join(
+		data %>% 
+			select(geoid, geometry) %>% 
+			group_by(geoid) %>% 
+			mutate(id = row_number()), 
+		by = c("geoid", "id")
+	) %>% 
+	ungroup() %>% 
+	select(-id)
+	
+data_calls <-
+	data_write %>% 
+	mutate(
+		fix_min = ifelse(status == "closed", (updt_dt - req_dt) * 60, NA)
+	) %>% 
+	select(
+		city,
+		status,
+		srvc_nm,
+		address,
+		req_dt,
+		updt_dt,
+		fix_min,
+		geoid,
+		topic,
+		req_aim,
+		illegal,
+		adv
+	)
+
+print("You're all set!")
+
+rm("write_my_files", "rename_data", "rectify_columns", "data", "data_write")
