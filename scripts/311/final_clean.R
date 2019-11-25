@@ -30,6 +30,13 @@ if (!exists("project_dir")) {
 source(paste0(project_dir, "/scripts/311/find_complaint_categories.R"))
 
 # Drop any additional erroneous rows. Ideally this should be done in the earliest script possible.
+drop_rows <- function(df) {
+	
+	df %>%
+		# Filters out "stale" requests. In Chicago, will filter out mostly outdated tobacco complaints.
+		filter((updt_dt - req_dt) < years(3))
+	
+}
 
 # Dropping columns if unneccesary. Ideally this should be done in the earliest script possible.
 
@@ -70,6 +77,7 @@ if (!exists("write_my_files")) {
 	data %>%
 		rename_data %>% 
 		rectify_columns() %>% 
+		drop_rows() %>% 
 		st_write(paste0(project_dir, "/data/311/", data_city, "/", data_name,".shp"), delete_layer = TRUE)
 	
 	print("Shapefiles written!")
@@ -79,6 +87,7 @@ if (!exists("write_my_files")) {
 	data %>%
 		rename_data %>%
 		rectify_columns() %>%
+		drop_rows() %>%
 		st_write(paste0(project_dir, "/data/311/", data_city, "/", data_name,".shp"), delete_layer = TRUE)
 	
 	print("Shapefiles written!")
@@ -87,7 +96,8 @@ if (!exists("write_my_files")) {
 data <-
 	data %>% 
 	rename_data() %>%
-	rectify_columns()
+	rectify_columns() %>% 
+	drop_rows()
 	
 data_write <-
 	data %>% 
@@ -145,7 +155,7 @@ data_descriptive <-
 data_calls <-
 	data_write %>% 
 	mutate(
-		fix_min = ifelse(status == "closed", (updt_dt - req_dt) * 60, NA)
+		fix_min = ifelse(status == "closed", (updt_dt - req_dt) / 60, NA)
 	) %>% 
 	select(
 		city,

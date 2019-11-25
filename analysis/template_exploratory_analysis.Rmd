@@ -3,6 +3,8 @@ title: "Exploratory Analysis Template"
 author: "Michael Spencer"
 date: "11/24/2019"
 output: pdf_document
+params:
+  city: "CHI"
 ---
 
 ```{r setup, include=FALSE}
@@ -14,8 +16,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Pathways
 ```{r}
 project_dir <- here::here()
-data_name <- "CHI_data_census"
-data_city <- "CHI"
+data_city <- params$city
+data_name <- paste0(data_city, "_data_census")
 ```
 
 ### Parameters
