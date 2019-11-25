@@ -1,0 +1,45 @@
+---
+title: "Exploratory Analysis Template"
+author: "Michael Spencer"
+date: "11/24/2019"
+output: pdf_document
+params:
+  city: "CHI"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+### Pathways
+```{r}
+project_dir <- here::here()
+data_city <- params$city
+data_name <- paste0(data_city, "_data_census")
+```
+
+### Parameters
+```{r}
+write_my_files <- "no" # If you'd like to write out a .shp and .tsv file, use "yes", otherwise "no".
+```
+
+### Sourcing and Libraries
+```{r}
+### Libraries
+if (!require(sf)) install.packages("sf")
+library(sf)
+
+if (!require(tidyverse)) install.packages("tidyverse")
+library(tidyverse)
+
+if (!require(lubridate)) install.packages("lubridate")
+library(lubridate)
+
+if (!require(googlesheets4)) install.packages("googlesheets4")
+library(googlesheets4)
+
+### Source prep and cleaning files to load data
+source(paste0(project_dir, "/scripts/311/final_clean.R"))
+```

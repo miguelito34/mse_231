@@ -7,37 +7,25 @@
 ##        further categorization may be needed.
 ################################################################################
 
-## Setup
-
-### Libraries
-if (!require(sf)) install.packages("sf")
-library(sf)
-
-if (!require(tidyverse)) install.packages("tidyverse")
-library(tidyverse)
-
 ### Parameters
-path_categories <- "data/311/complaint_categorization.csv" # Ensure you have the latest table from Google Sheets.
-path_data_shapefiles <- "data_raw/311/joined/sample_311_data_300k_BOS_CHI_SFO_census.shp"
+# Will read from Google Sheets so ensure sheet is updated and stable
+path_categories <- "https://docs.google.com/spreadsheets/d/16_G3nBNMg3H88tBs2i8BO1enHWza5p8tyM_giACXvPM/edit#gid=0"
+path_data_shapefiles <- paste0(project_dir, "/data_raw/311/joined/", data_name, ".shp")
 
-### Load Data
-data_categories <- path_categories %>% read_csv()
-data_shapefiles <- 
+print("Getting info to match calls to request categories...")
+
+### Load  and Join Data
+data_categories <- 
+    path_categories %>% 
+    read_sheet() %>% 
+    select(-explain)
+
+data <- 
     path_data_shapefiles %>% 
     st_read() %>% 
-    mutate(city = str_extract(city, pattern = ".+(?=[,_])"))
-
-#===============================================================================
-
-## Join and Write Data
-data_write <- 
-    data_shapefiles %>% 
+    mutate(city = str_extract(city, pattern = ".+(?=[,_])")) %>% 
     left_join(data_categories, by = c("city", "service_na" = "req_name"))
 
-data_write %>%
-    st_write("data/311/sample_311_data_300k_BOS_CHI_SFO_clean.shp")
+print("Finished matching calls to complaint categories, will clean data now...")
 
-data_shapefiles %>% 
-    left_join(data_categories, by = c("city", "service_na" = "req_name")) %>%
-    select(-geometry) %>%
-    write_tsv("data/311/sample_311_data_300k_BOS_CHI_SFO_clean.tsv")
+rm("path_categories", "path_data_shapefiles", "data_categories")

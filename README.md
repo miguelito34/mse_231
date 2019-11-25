@@ -111,7 +111,22 @@ To carry out a substantive analysis, we categorize each service request into var
 Rscript scripts/311/find_complaint_categories.R
 ```
 
+6. Perform final cleaning and prepping of the data. This will write out the relevant files. If you wish to re-run analysis, you should skip this step and run the analysis script below, which auto-runs the cleaning script. 
+
+```
+Rscript scripts/311/final_clean.R
+```
+
 This script outputs the prepped data to `data/311/<data_version>_clean` and produces both a `.shp` and `.tsv` file to suit your needs.
+
+7. Replicate the analysis or start your own
+
+To replicate the analysis thus far run the following, substituting `<city abbreviation>` for a city of your choosing:
+```
+Rscript -e "rmarkdown::render('analysis/exploratory_analysis.Rmd', params=list(city = '<city abbreviation>'))"
+```
+
+To perform your own analysis, you can start with the template at `analysis/template_exploratory_analysis.Rmd` by opening it in RStudio. The code already written will load the neccessary packages to read in and clean the data for analysis. Some of the data is pulled from a google sheet that the team maintains. Upon running the script, you may be asked to authenticate your google account. Doing so gives the `googlesheets4` package, which is used to pull the data, permission to access the sheet. Please follow the instructions.
 
 ### Approach and Strategy (To Come)
 

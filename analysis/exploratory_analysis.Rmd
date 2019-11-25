@@ -1,0 +1,180 @@
+---
+title: "311 Exploratory Analysis"
+author: "Michael Spencer, "
+date: "11/21/2019"
+output: pdf_document
+params:
+  city: "CHI"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+
+### Pathways
+```{r}
+project_dir <- here::here()
+data_city <- params$city
+data_name <- paste0(data_city, "_data_census")
+```
+
+### Parameters
+```{r}
+write_my_files <- "no" # If you'd like to write out a .shp and .tsv file, use "yes", otherwise "no".
+```
+
+### Sourcing and Libraries
+```{r, include=FALSE}
+### Libraries
+if (!require(sf)) install.packages("sf")
+library(sf)
+
+if (!require(tidyverse)) install.packages("tidyverse")
+library(tidyverse)
+
+if (!require(lubridate)) install.packages("lubridate")
+library(lubridate)
+
+if (!require(googlesheets4)) install.packages("googlesheets4")
+library(googlesheets4)
+
+### Source prep and cleaning files to load data
+source(paste0(project_dir, "/scripts/311/final_clean.R"))
+```
+
+## Analysis
+
+### Base Benchmark Analysis (Non-Geographic)
+
+##### What is the distribution of call by topic?
+```{r, echo=FALSE}
+data_calls %>%
+  count(topic, sort = TRUE) %>%
+  mutate(prop_total = (n / sum(n)) %>% round(digits = 3)) %>%
+  knitr::kable()
+
+data_calls %>%
+  count(topic, sort = TRUE) %>%
+  mutate(
+    prop = n / sum(n, na.rm = TRUE),
+    topic = topic %>% fct_inorder() %>% fct_rev()
+  ) %>%
+  head(10) %>%
+  ggplot(aes(x = topic, y = prop)) +
+  geom_point() +
+  coord_flip() +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Most Frequent Request Topics",
+    x = "Request Topic",
+    y = "Proportion of Total Requests"
+  )
+```
+
+##### Within each topic, what are the most frequent services requested?
+```{r, include=FALSE}
+data_temp <-
+  data_calls %>%
+  group_by(topic, srvc_nm) %>%
+  summarize(total_service = n()) %>%
+  mutate(
+    total_topic = sum(total_service, na.rm = TRUE),
+    service_prop_topic = (total_service / total_topic) %>% round(digits = 3)
+  ) %>%
+  ungroup() %>%
+  mutate(topic_prop_all = total_topic / sum(total_service, na.rm = TRUE) %>% round(digits = 3)) %>%
+  arrange(desc(total_topic), desc(total_service))
+
+data_temp
+```
+
+```{r, echo=FALSE}
+list_topics <- data_temp %>%
+  distinct(topic) %>%
+  pull(topic)
+
+plot_top_services <- function(tp) {
+  data_temp %>%
+    filter(topic == tp) %>%
+    head(3) %>%
+    mutate(srvc_nm = srvc_nm %>% fct_inorder() %>% fct_rev()) %>%
+    ggplot(aes(x = srvc_nm, y = service_prop_topic)) +
+    geom_point() +
+    coord_flip() +
+    scale_y_continuous(labels = scales::percent_format()) +
+    labs(
+      title = paste0("Frequently Requested Services: ", tp %>% str_to_title()),
+      x = "Requested Service",
+      y = paste0("Proportion of Total Requests in Topic")
+    )
+}
+
+map(list_topics, plot_top_services)
+```
+
+##### What is the proportion of requests that may be adversarial by topic?
+```{r, echo=FALSE}
+# Excludes "maybe" adversarial in calculations.
+
+data_calls %>%
+  group_by(topic) %>%
+  summarise(
+    tot_adversarial = sum(adv == "yes", na.rm = TRUE),
+    tot_not_adversarial = sum(adv == "no", na.rm = TRUE)
+  ) %>%
+  mutate(
+    prop_adversarial =
+      tot_adversarial / (tot_adversarial + tot_not_adversarial),
+    prop_not_adversarial =
+    	tot_not_adversarial / (tot_adversarial + tot_not_adversarial)
+  ) %>%
+	arrange(desc(prop_adversarial)) %>% 
+  knitr::kable()
+```
+
+##### What is the proportion of requests that may involve illegal acitivity by topic?
+```{r, echo=FALSE}
+# Excludes "maybe" illegal in calculations.
+
+data_calls %>%
+  group_by(topic) %>%
+  summarise(
+    tot_illegal = sum(illegal == "yes", na.rm = TRUE),
+    tot_not_illegal = sum(illegal == "no", na.rm = TRUE)
+  ) %>%
+  mutate(
+    prop_illegal =
+      tot_illegal / (tot_illegal + tot_not_illegal),
+    prop_not_illegal =
+    	tot_not_illegal / (tot_illegal + tot_not_illegal)
+  ) %>%
+	arrange(desc(prop_illegal)) %>% 
+  knitr::kable()
+```
+
+##### What is the average time needed to close a request pertaining to something potentially illegal?
+```{r}
+# This needs mroe thinking through, as there is bound to be extraneous data here.
+
+# data_calls %>% 
+# 	summary()
+# 
+# data_calls %>% 
+# 	mutate()
+
+data_calls %>% 
+	filter(status == "closed", fix_min < 300000) %>%
+	group_by(illegal) %>% 
+	summarise(
+		avg_minutes_to_close = mean(fix_min, na.rm = TRUE),
+		avg_hours_to_close = avg_minutes_to_close / 60,
+		avg_days_to_close = avg_hours_to_close / 24
+	)
+```
+
+
+##### What is the average time needed to close a request by topic?
+
+### Geographic Analysis

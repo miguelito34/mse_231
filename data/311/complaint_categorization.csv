@@ -1,7 +1,7 @@
 req_name,req_aim,illegal,adv,topic,city,explain
 Abandoned Vehicle,human,yes,yes,abandoned bike/vehicle,Bloomington,-
 Accessibility Problem,human,no,yes,blocked passage,Bloomington,-
-Animal Control,non-human,no,maybe,animal,Bloomington,-
+Animal Control,non-human,no,maybe,animal/pest,Bloomington,-
 Biking & Walking,human,no,no,blocked passage,Bloomington,-
 Blocked Sidewalk,human,maybe,yes,blocked passage,Bloomington,-
 Blocked Street,uncertain,maybe,maybe,blocked passage,Bloomington,-
@@ -59,20 +59,30 @@ Abandoned Bicycle,human,yes,yes,abandoned bike/vehicle,Boston,-
 Abandoned Vehicle,human,yes,yes,abandoned bike/vehicle,Boston,-
 Broken Park Equipment,non-human,no,no,city infrastructure,Boston,-
 Broken Sidewalk,non-human,no,no,city infrastructure,Boston,-
+CE Collection,non-human,no,no,construction,Boston,-
 Damaged Sign,non-human,maybe,yes,property damage (public),Boston,-
-Dead Animal Pick-up,non-human,no,no,animal,Boston,-
+Dead Animal Pick-up,non-human,no,no,animal/pest,Boston,-
 Dead Tree Removal,non-human,no,no,landscaping request/concern,Boston,-
+Illegal Auto Body Shop,human,yes,yes,business,Boston,-
+Illegal Dumping,human,yes,yes,waste/cleanup services,Boston,-
 Illegal Graffiti,human,yes,yes,graffiti,Boston,-
 Illegal Parking,human,yes,yes,blocked passage,Boston,Complaints against human driver
 Litter,human,yes,yes,waste/cleanup services,Boston,Complaints against human who litter
+Litter Basket Maintenance,non-human,no,no,waste/cleanup services,Boston,-
+Missed Trash or Recycling,non-human,no,no,waste/cleanup services,Boston,-
 Needle Clean-up,human,yes,yes,health concern/public safety,Boston,Could be biased based on complaints against people using drugs
 New Tree Requests,non-human,no,no,landscaping request/concern,Boston,-
 Other,uncertain,maybe,no,other/miscellaneous,Boston,-
 Overflowing Trash Can,human,no,yes,waste/cleanup services,Boston,Complaints against trash
 Park Lights,non-human,no,yes,city infrastructure,Boston,-
 Pothole,non-human,no,no,roadway/roadway lighting,Boston,-
+Recycling Cart Return,non-human,no,no,waste/cleanup services,Boston,-
 Residential Trash out Illegally,human,yes,yes,waste/cleanup services,Boston,Complaints against human who trashed out
-Rodent Sighting,non-human,no,no,animal,Boston,-
+Rodent Sighting,non-human,no,no,animal/pest,Boston,-
+Schedule a Bulk Item Pickup,non-human,no,no,waste/cleanup services,Boston,-
+Sidewalk Cover / Manhole,non-human,no,no,city infrastructure,Boston,-
+Sticker Request,non-human,no,no,other/miscellaneous,Boston,-
+Street Light Knock Downs,non-human,no,no,roadway/roadway lighting,Boston,-
 Street Lights,non-human,no,no,roadway/roadway lighting,Boston,-
 Traffic Signal,non-human,no,no,roadway/roadway lighting,Boston,-
 Tree Pruning,non-human,no,no,landscaping request/concern,Boston,-
@@ -87,64 +97,143 @@ Roadway Plowing/Sanding,non-human,no,no,roadway/roadway lighting,Brookline,-
 Sidewalk Obstruction/Repair,non-human,no,no,blocked passage,Brookline,-
 Streetlight,non-human,no,no,roadway/roadway lighting,Brookline,-
 Unshoveled Sidewalk,human,no,maybe,blocked passage,Brookline,brookline requires property owners to maintain their own sidewalks
+A Citizen Comment,non-human,no,no,city feedback,Chicago,-
 Abandoned Motor Vehicles,human,yes,yes,abandoned bike/vehicle,Chicago,-
+Abandoned Vehicle Complaint,human,yes,yes,abandoned bike/vehicle,Chicago,-
+Accessible Home Modifications - Disabilities,human,no,no,other/miscellaneous,Chicago,-
+Affordable Rental Housing List,human,no,no,information request,Chicago,-
+Air Cond./Refrigeraton Violation,non-human,yes,no,building concern/code violation,Chicago,-
 "Air Pollution, Odor or Dust Complaint",uncertain,no,no,health concern/public safety,Chicago,-
 Aircraft Noise Complaint,non-human,no,no,noise,Chicago,Noise coming from people living near Airports
+Alley Grading-Unimproved,non-human,no,no,roadway/roadway lighting,Chicago,-
 Alley Light Out Complaint,non-human,no,no,roadway/roadway lighting,Chicago,-
 Alley Pothole Complaint,non-human,no,no,roadway/roadway lighting,Chicago,-
 Alley Sewer Inspection Request,non-human,no,no,city infrastructure,Chicago,-
-Animal In Trap Complaint,non-human,no,maybe,animal,Chicago,"Although mainly caused by Humans, it is not a direct complaint against a human"
+Animal Abandoned,human,maybe,maybe,animal/pest,Chicago,-
+Animal Business Complaint,human,maybe,yes,business,Chicago,-
+Animal Fighting Suspicion,human,yes,yes,animal/pest,Chicago,-
+Animal In Trap Complaint,non-human,no,maybe,animal/pest,Chicago,"Although mainly caused by Humans, it is not a direct complaint against a human"
 Asbestos Complaint,non-human,no,no,building concern/code violation,Chicago,-
-Bee/Wasp Removal,non-human,no,no,animal,Chicago,-
+B-Box Investigations,non-human,no,no,utilities request/concern,Chicago,-
+Bad Address,non-human,no,no,housing,Chicago,-
+Bee/Wasp Removal,non-human,no,no,animal/pest,Chicago,-
+Benefit Access Assistance - Disabilities,human,no,no,other/miscellaneous,Chicago,-
 Bicycle Request/Complaint,human,no,yes,abandoned bike/vehicle,Chicago,"Refers to bycicle theft, abandoned bycicles"
+Bike Lane Post Repair,non-human,no,no,roadway/roadway lighting,Chicago,-
+Black Garbage Cart Removal,non-human,no,no,waste/cleanup services,Chicago,-
 Blue Recycling Cart,non-human,no,no,waste/cleanup services,Chicago,-
+Board of Education,human,no,no,information request,Chicago,-
+Bridges and Viaducts (All Types),non-human,no,no,city infrastructure,Chicago,-
+Building Public Facility Violation,non-human,yes,no,building concern/code violation,Chicago,-
+Building Violation,non-human,yes,maybe,building concern/code violation,Chicago,-
 Buildings - Boiler Violation,non-human,yes,no,building concern/code violation,Chicago,-
 Buildings - Electrical Violation,non-human,yes,no,building concern/code violation,Chicago,-
 Buildings - Elevator Violation,non-human,yes,no,building concern/code violation,Chicago,-
 Buildings - Furnace Violation,non-human,yes,no,building concern/code violation,Chicago,-
 Buildings - Plumbing Violation,non-human,yes,no,building concern/code violation,Chicago,-
+Bulk Pickup,non-human,no,no,waste/cleanup services,Chicago,-
 Bungalow Rehab/Purchase Information Request,non-human,no,no,information request,Chicago,-
 Cab Feedback,human,maybe,yes,taxi/ride-sharing,Chicago,-
+Cable Cut,non-human,maybe,no,business,Chicago,-
 Cable TV Complaint,non-human,no,maybe,business,Chicago,-
+CDBG Flood Assistance Grant,non-human,no,no,information request,Chicago,-
+CDOT Construction Complaints,human,maybe,yes,construction,Chicago,-
+CDOT Electrical Operations Construction Complaints,human,maybe,yes,utilities request/concern,Chicago,-
+CHA Miscellaneous,non-human,maybe,no,other/miscellaneous,Chicago,-
+CHA-Section 8 Program,human,no,no,housing,Chicago,-
+Check for Leak,non-human,no,no,building concern/code violation,Chicago,-
+City Electrical Vault,non-human,no,no,utilities request/concern,Chicago,-
 City Vehicle Sticker Violation,non-human,yes,no,other/miscellaneous,Chicago,-
 Clean and Green Program Request,non-human,no,no,information request,Chicago,-
 Clean Vacant Lot Request,non-human,no,maybe,waste/cleanup services,Chicago,-
+Condition of City Vehicle,non-human,no,no,other/miscellaneous,Chicago,-
 Construction & Demolition Complaint,human,maybe,yes,construction,Chicago,Complaints against humans in construction / demolition
 Consumer Fraud Complaint,human,yes,yes,business,Chicago,-
 Consumer Retail Store Complaint,human,maybe,yes,business,Chicago,-
-Coyote Interaction Complaint,non-human,no,no,animal,Chicago,-
+Coyote Interaction Complaint,non-human,no,no,animal/pest,Chicago,-
+Crane Operator License,human,maybe,no,information request,Chicago,-
+Crisis Referral,human,no,no,health concern/public safety,Chicago,-
+CTA Customer Comment,human,no,yes,city feedback,Chicago,-
 Daycare Center,human,no,no,information request,Chicago,Usually complaints against humans in daycare center
-Dead Animal Pick-Up Request,non-human,no,no,animal,Chicago,-
-Dead Bird,non-human,no,no,animal,Chicago,-
+Dead Animal Pick-Up Request,non-human,no,no,animal/pest,Chicago,-
+Dead Bird,non-human,no,no,animal/pest,Chicago,-
+Department of Housing Mortgage Credit Certificate Program,non-human,no,no,information request,Chicago,-
+Disabled Parking,human,no,no,other/miscellaneous,Chicago,-
+Discrimination/Hate Crimes Assistance Request,human,yes,yes,health concern/public safety,Chicago,-
+Drug and Gang House/Criminal Activity,human,yes,yes,health concern/public safety,Chicago,-
 E-Scooter,human,maybe,yes,taxi/ride-sharing,Chicago,-
+Electrical Sign Inspection,non-human,no,no,utilities request/concern,Chicago,-
+Emergency Heating Repair Program (Formerly known as EHAP),non-human,no,no,information request,Chicago,-
 Equipment Noise Complaint,human,yes,yes,noise,Chicago,-
 Extreme Weather Notification,non-human,no,no,health concern/public safety,Chicago,-
+Fire Assistance,human,maybe,no,health concern/public safety,Chicago,-
+Fire Miscellaneous,human,maybe,no,health concern/public safety,Chicago,-
 Fire Safety Inspection Request,non-human,maybe,maybe,building concern/code violation,Chicago,-
+Flooded Viaduct,non-human,no,no,city infrastructure,Chicago,-
+Fly Dump (Tires),human,yes,yes,waste/cleanup services,Chicago,-
 Fly Dumping Complaint,human,yes,yes,waste/cleanup services,Chicago,-
+Furniture Repair - CTA,non-human,no,no,city infrastructure,Chicago,-
+Garage Demo Inspection,non-human,no,no,building concern/code violation,Chicago,-
 Garbage Cart Maintenance,non-human,no,no,waste/cleanup services,Chicago,-
+Garbage Cart New Collection No Prior Service,non-human,no,no,waste/cleanup services,Chicago,-
 Gas Station and Storage Tank Complaint,human,no,maybe,business,Chicago,Usaully refers to gas leaks
 Graffiti Removal Request,human,yes,yes,graffiti,Chicago,-
 Groceries,uncertain,no,no,information request,Chicago,-
+Guardrail/ Bike Lane/ Roadside Protection Maintenance,non-human,no,no,roadway/roadway lighting,Chicago,-
+Gym Shoe/Object On Electrical Wire,human,maybe,yes,utilities request/concern,Chicago,-
 Health Club,human,no,no,information request,Chicago,-
+Health Referral - NAMI,human,no,no,health concern/public safety,Chicago,-
 Home Buyer Program Info Request,uncertain,no,no,information request,Chicago,-
+Homeless Prevention,human,maybe,yes,housing,Chicago,-
 Hotel/Motel - Health Department,human,maybe,maybe,business,Chicago,-
+Housing Information - Disabilities,human,no,no,other/miscellaneous,Chicago,-
+Housing Inquiries,human,no,maybe,housing,Chicago,-
+How's my driving?,human,no,yes,city feedback,Chicago,-
+Hydrant Cap Missing,non-human,no,no,city infrastructure,Chicago,-
+Hydrant Check,non-human,no,no,city infrastructure,Chicago,-
+Ice and Snow Removal Request,non-human,no,no,blocked passage,Chicago,-
+Illegal Dumping,human,yes,yes,waste/cleanup services,Chicago,-
+In-Ground Pedestrian Crossing Sign Repair,non-human,no,no,city infrastructure,Chicago,-
+In-Home Services ? Disabilities,human,no,no,health concern/public safety,Chicago,-
 Inaccurate Fuel Pump Complaint,human,maybe,yes,business,Chicago,-
 Inaccurate Retail Scales Complaint,human,maybe,yes,business,Chicago,-
+Inspect Public Way Survey,non-human,no,no,blocked passage,Chicago,-
+Isolated Senior Crisis Referral,human,no,maybe,health concern/public safety,Chicago,-
+Landlord/Tenant Info Request,human,no,maybe,information request,Chicago,-
+Landscape Median Maintenance,non-human,no,no,roadway/roadway lighting,Chicago,-
 Lead Inspection Request,non-human,no,no,utilities request/concern,Chicago,-
 Licensed Pharmaceutical Representative Complaint,human,yes,yes,business,Chicago,-
 Liquor Establishment Complaint,human,maybe,yes,business,Chicago,Refers to compalaints agains human in charge of establishment
+Locate/ID Main/Service/BBox/Meter Vault,non-human,no,,utilities request/concern,Chicago,-
+Location Inquiry,non-human,no,no,information request,Chicago,-
 Low Water Pressure Complaint,non-human,no,yes,utilities request/concern,Chicago,-
+Midway Customer Service,human,no,no,city infrastructure,Chicago,-
+Midway Facilities Complaint,non-human,no,yes,city infrastructure,Chicago,-
 Minimum Wage Complaint,human,maybe,yes,business,Chicago,-
 Missed Garbage Pick-Up Complaint,non-human,no,no,waste/cleanup services,Chicago,-
+Missing Lid/Grate/Cover,non-human,no,no,city infrastructure,Chicago,-
+Mobile Food Vehicle,human,maybe,yes,business,Chicago,-
+Mosquito Spraying Inquiries (Formerly West Nile Virus),non-human,no,no,animal/pest,Chicago,-
+New Excavation or Construction Rodent Siting Inspection,non-human,maybe,no,animal/pest,Chicago,-
 No Building Permit and Construction Violation,human,yes,yes,construction,Chicago,Complaints against humans in construction / demolition
+No Heat Complaint,non-human,no,yes,utilities request/concern,Chicago,-
 No Solicitation Complaint,human,no,yes,business,Chicago,Complaints against humans soliciting
+No Vehicle Idling (Diesel),human,yes,yes,abandoned bike/vehicle,Chicago,-
 No Water Complaint,non-human,no,yes,utilities request/concern,Chicago,-
-Nuisance Animal Complaint,non-human,no,yes,animal,Chicago,-
+Nuisance Animal Complaint,non-human,no,yes,animal/pest,Chicago,-
+O'Hare Customer Service,human,no,yes,city infrastructure,Chicago,-
+O'Hare Facilities Complaint,non-human,no,yes,city feedback,Chicago,-
 Open Fire Hydrant Complaint,non-human,no,maybe,city infrastructure,Chicago,-
 Operating Without Business License Complaint,human,yes,yes,business,Chicago,Complaint against people running a business
 Outdated Merchandise Complaint,human,maybe,yes,business,Chicago,Complaints against human vendor
 Paid Sick Leave Violation,human,yes,yes,business,Chicago,Complaints against human employer
-Pet Wellness Check Request,human,no,no,animal,Chicago,Complaint against pet-owner
+Park Repair/Maintenance,non-human,no,no,city infrastructure,Chicago,-
+Park Rodent Abatement,non-human,no,no,animal/pest,Chicago,-
+Pavement Buckle Repair,non-human,no,no,roadway/roadway lighting,Chicago,-
+Pet Wellness Check Request,human,no,no,animal/pest,Chicago,Complaint against pet-owner
+Petcoke Dust Complaint,non-human,no,yes,health concern/public safety,Chicago,-
+POLICE DEPT speaker request (FOR CPD ONLY),human,yes,no,health concern/public safety,Chicago,-
+Police Miscellaneous,human,yes,yes,health concern/public safety,Chicago,-
 Porch Inspection Request,human,no,yes,housing,Chicago,Complaint about someone else's property/their mainenance of it
 Pothole in Street Complaint,non-human,no,no,roadway/roadway lighting,Chicago,-
 Protected Bike Lane - Debris Removal,non-human,no,no,blocked passage,Chicago,-
@@ -152,49 +241,90 @@ Public Vehicle/Valet Complaint,human,maybe,yes,taxi/ride-sharing,Chicago,Complai
 Pushcart Food Vendor Complaint,human,maybe,yes,business,Chicago,-
 Recycling Inspection Request,non-human,no,no,waste/cleanup services,Chicago,-
 Recycling Pick Up,non-human,no,no,waste/cleanup services,Chicago,-
+Red Light Camera,human,maybe,no,other/miscellaneous,Chicago,-
+Relocated Vehicle,human,maybe,yes,abandoned bike/vehicle,Chicago,-
+Relocation Request,human,no,yes,housing,Chicago,-
 Renters and Foreclosure Complaint,human,maybe,yes,housing,Chicago,-
-Report an Injured Animal,non-human,no,no,animal,Chicago,-
+Report an Injured Animal,non-human,no,no,animal/pest,Chicago,-
+Request to Install Custodian on Fire Hydrant,non-human,no,no,city infrastructure,Chicago,-
+Request Water Shut-Off Occupied Building,non-human,no,no,utilities request/concern,Chicago,-
+Request Water Shut-off Vacant Building,non-human,no,yes,utilities request/concern,Chicago,-
 Restaurant Complaint,human,maybe,yes,business,Chicago,Complaint against service staff/restaurant owners
 Ridesharing Complaint,human,maybe,yes,taxi/ride-sharing,Chicago,-
-Rodent Baiting/Rat Complaint,non-human,no,no,animal,Chicago,-
+Rodent Baiting/Rat Complaint,non-human,no,no,animal/pest,Chicago,-
 Roof and Porch Repair Program,non-human,no,no,information request,Chicago,-
 Sanitation Code Violation,human,yes,yes,building concern/code violation,Chicago,Complaints against human in charge of Sanitation
+Sanitation Tire Pickup,non-human,no,no,waste/cleanup services,Chicago,-
+Senior Information and Assistance Request,human,no,no,information request,Chicago,-
+Senior Related Literature Request,human,no,no,information request,Chicago,-
+Senior Well-Being Check Request,human,no,no,health concern/public safety,Chicago,-
 Sewer Cave-In Inspection Request,non-human,no,no,city infrastructure,Chicago,-
 Sewer Cleaning Inspection Request,non-human,no,no,city infrastructure,Chicago,-
 Shared Housing/Vacation Rental Complaint,human,maybe,yes,city infrastructure,Chicago,-
+Shelter Request,human,no,no,housing,Chicago,-
 Sidewalk Cafe Complaint,human,maybe,yes,business,Chicago,Complaints against human in charge of Café
 Sidewalk Inspection Request,non-human,no,no,city infrastructure,Chicago,-
+"Sign - Loading or Standing Zone (New Installation, Amendment, Removal)",non-human,no,no,roadway/roadway lighting,Chicago,-
+Sign Repair -  Base / Bolt Removal,non-human,no,no,roadway/roadway lighting,Chicago,-
+Sign Repair - Base / Bolt Removal,non-human,no,no,roadway/roadway lighting,Chicago,-
 Sign Repair Request - All Other Signs,non-human,no,no,roadway/roadway lighting,Chicago,-
 Sign Repair Request - Do Not Enter Sign,non-human,no,no,roadway/roadway lighting,Chicago,-
 Sign Repair Request - One Way Sign,non-human,no,no,roadway/roadway lighting,Chicago,-
 Sign Repair Request - Residential Permit Parking,non-human,no,no,roadway/roadway lighting,Chicago,-
 Sign Repair Request - Stop Sign,non-human,no,no,roadway/roadway lighting,Chicago,-
+Small Accessible Repairs for Senior's (Formerly known as H-RAIL),human,no,no,city infrastructure,Chicago,-
 Smokeless Tobacco at Sports Event Complaint,human,yes,yes,health concern/public safety,Chicago,Complaints against human smoker
+Smoking: Food Establishment,human,yes,yes,health concern/public safety,Chicago,-
 Smoking: Non-Food Establishment,human,yes,yes,health concern/public safety,Chicago,Complaints against human smoker
+Snow - Object/Dibs Removal Request,non-human,no,no,blocked passage,Chicago,-
+Snow - Uncleared Sidewalk/Bike Lane Complaint,non-human,no,no,blocked passage,Chicago,-
 Snow Removal - Protected Bike Lane or Bridge Sidewalk,non-human,no,no,blocked passage,Chicago,-
+Speed Camera,human,maybe,no,roadway/roadway lighting,Chicago,-
+Speed Hump Repair,non-human,no,no,roadway/roadway lighting,Chicago,-
 Spills or Dumping in Natural Water Ways,non-human,maybe,yes,health concern/public safety,Chicago,-
-Stray Animal Complaint,non-human,no,maybe,animal,Chicago,-
+Stray Animal Complaint,non-human,no,maybe,animal/pest,Chicago,-
 Street Cleaning Request,non-human,no,no,waste/cleanup services,Chicago,-
+Street Furniture (All Types),human,no,maybe,roadway/roadway lighting,Chicago,-
 Street Light On During Day Complaint,non-human,no,no,roadway/roadway lighting,Chicago,-
 Street Light Out Complaint,non-human,no,no,roadway/roadway lighting,Chicago,-
 Street Light Pole Damage Complaint,non-human,no,no,roadway/roadway lighting,Chicago,-
 Street Light Pole Door Missing Complaint,non-human,no,no,roadway/roadway lighting,Chicago,-
+Street Lights - All/Out,non-human,no,no,roadway/roadway lighting,Chicago,-
+Street Paint Marking Maintenance,non-human,no,no,roadway/roadway lighting,Chicago,-
+Structural Violation,uncertain,yes,yes,building concern/code violation,Chicago,-
+Swimming Pool Insp,uncertain,no,no,city infrastructure,Chicago,-
 Tanning and Body Art Complaint,human,maybe,yes,other/miscellaneous,Chicago,Complaints against artist
 Tobacco - General Complaint,human,maybe,yes,business,Chicago,Complaints against human smoker
 Tobacco - Sale to Minors Complaint,human,yes,yes,business,Chicago,Complaints against human vendor
+Toxic and Hazardous Materials,non-human,yes,no,health concern/public safety,Chicago,-
+Traffic Calming,human,no,no,roadway/roadway lighting,Chicago,-
 Traffic Signal Out Complaint,non-human,no,no,roadway/roadway lighting,Chicago,-
+Traffic Signal Timing,non-human,no,no,roadway/roadway lighting,Chicago,-
+Transportation Assistance ? Disabilities,human,no,no,other/miscellaneous,Chicago,-
+Trap Pick-Up,human,no,no,roadway/roadway lighting,Chicago,-
 Tree Debris Clean-Up Request,non-human,no,no,landscaping request/concern,Chicago,-
+Tree Emergency,non-human,no,no,landscaping request/concern,Chicago,-
 Tree Planting Request,non-human,no,no,landscaping request/concern,Chicago,-
 Tree Removal Request,non-human,no,no,landscaping request/concern,Chicago,-
 Tree Trim Request,non-human,no,no,landscaping request/concern,Chicago,-
+Unwanted Animal,non-human,no,maybe,animal/pest,Chicago,-
+Utility/Energy Assistance - Disabilities,human,no,no,other/miscellaneous,Chicago,-
 Vacant/Abandoned Building Complaint,human,maybe,yes,abandoned building,Chicago,Complaints against facility
 Vehicle Parked in Bike Lane Complaint,human,yes,yes,blocked passage,Chicago,Complaints against human owner of car
+Ventilation Violation,non-human,no,yes,building concern/code violation,Chicago,-
 Viaduct Light Out Complaint,non-human,no,no,roadway/roadway lighting,Chicago,-
-Vicious Animal Complaint,non-human,no,yes,animal,Chicago,-
+Vicious Animal Complaint,non-human,no,yes,animal/pest,Chicago,-
+Volunteer Network,human,no,no,other/miscellaneous,Chicago,-
 Water in Basement Complaint,non-human,no,no,building concern/code violation,Chicago,-
+Water Lead Test Kit Request,non-human,no,no,utilities request/concern,Chicago,-
+Water Lead Test Visit Request,non-human,no,no,utilities request/concern,Chicago,-
+Water Management - Investigate for Restoration,non-human,no,no,utilities request/concern,Chicago,-
 Water On Street Complaint,non-human,no,no,roadway/roadway lighting,Chicago,-
+Water Quality Concern,non-human,no,no,utilities request/concern,Chicago,-
 Weed Removal Request,non-human,no,no,landscaping request/concern,Chicago,-
+Wildlife Assistance in Living Quarters,non-human,no,no,animal/pest,Chicago,-
 Wire Basket Request,non-human,no,no,waste/cleanup services,Chicago,-
+Wire Down,non-human,no,no,utilities request/concern,Chicago,-
 Yard Waste Pick-Up Request,non-human,no,maybe,waste/cleanup services,Chicago,-
 Abandoned Vehicle (on Street),human,yes,yes,abandoned bike/vehicle,Peoria,-
 Abandoned Vehicle (Private Property),human,yes,yes,abandoned bike/vehicle,Peoria,-
@@ -203,7 +333,7 @@ Arson Tips,human,yes,maybe,health concern/public safety,Peoria,-
 "Blocked Street, Alley, Sidewalk",human,maybe,maybe,blocked passage,Peoria,-
 Broken Parking Meter,non-human,no,no,city infrastructure,Peoria,-
 Citizen Fire Concern,non-human,no,maybe,health concern/public safety,Peoria,-
-Dead Animal in Street,non-human,no,no,animal,Peoria,-
+Dead Animal in Street,non-human,no,no,animal/pest,Peoria,-
 Drainage/Flooding Problems,non-human,no,no,city infrastructure,Peoria,-
 Dumpsters Not Screened,human,yes,no,waste/cleanup services,Peoria,People need to screen their dumpsters in this city
 Excessive Growth-Private Property,human,no,yes,landscaping request/concern,Peoria,-
@@ -235,7 +365,7 @@ Parking lot in disrepair,non-human,no,yes,roadway/roadway lighting,Peoria,-
 Parking on Unpaved Surface,non-human,no,no,roadway/roadway lighting,Peoria,-
 "Potholes, Street Repair",non-human,no,no,roadway/roadway lighting,Peoria,-
 Private Business,human,maybe,yes,business,Peoria,Report againsta small business
-Rodents,non-human,no,no,animal,Peoria,-
+Rodents,non-human,no,no,animal/pest,Peoria,-
 Sewer Problems,non-human,no,no,city infrastructure,Peoria,-
 Sidewalk and Curbs,non-human,no,maybe,city infrastructure,Peoria,-
 Snow Removal Needed,non-human,no,no,blocked passage,Peoria,-
@@ -251,7 +381,9 @@ Website and Mobile App Feedback,non-human,no,no,city feedback,Peoria,-
 Working Without Building Permit,human,yes,yes,business,Peoria,-
 Yard Waste,non-human,no,maybe,waste/cleanup services,Peoria,-
 Abandoned Motor Vehicles,human,yes,yes,abandoned bike/vehicle,San Francisco,-
+Blocked Driveway & Illegal Parking,human,yes,yes,blocked passage,San Francisco,-
 Blocked Driveway & Illigal Parking,human,yes,yes,blocked passage,San Francisco,-
+Blocked Pedestrian Walkway,human,maybe,yes,blocked passage,San Francisco,-
 Blocked Pedestrian Walway,human,maybe,yes,blocked passage,San Francisco,-
 Curb & Sidewalk Issues,non-human,no,no,roadway/roadway lighting,San Francisco,-
 Damaged Public Property,non-human,maybe,yes,property damage (public),San Francisco,-
@@ -267,33 +399,3 @@ Pothole & Street Issues,non-human,no,no,roadway/roadway lighting,San Francisco,-
 Street or Sidewalk Cleaning,non-human,no,no,waste/cleanup services,San Francisco,-
 Streetlight Repair,non-human,no,no,roadway/roadway lighting,San Francisco,-
 Tree Maintenance,non-human,no,no,landscaping request/concern,San Francisco,-
-CE Collection,non-human,no,no,construction,Boston,-
-Illegal Auto Body Shop,human,yes,yes,business,Boston,-
-Illegal Dumping,human,yes,yes,waste/cleanup services,Boston,-
-Litter Basket Maintenance,non-human,no,no,waste/cleanup services,Boston,-
-Missed Trash or Recycling,non-human,no,no,waste/cleanup services,Boston,-
-Recycling Cart Return,non-human,no,no,waste/cleanup services,Boston,-
-Schedule a Bulk Item Pickup,non-human,no,no,waste/cleanup services,Boston,-
-Sidewalk Cover / Manhole,non-human,no,no,city infrastructure,Boston,-
-Sticker Request,non-human,no,no,other/miscellaneous,Boston,-
-Street Light Knock Downs,non-human,no,no,roadway/roadway lighting,Boston,-
-Abandoned Vehicle Complaint,human,yes,yes,abandoned bike/vehicle,Chicago,-
-Affordable Rental Housing List,human,no,no,information request,Chicago,-
-Alley Grading-Unimproved,non-human,no,no,roadway/roadway lighting,Chicago,-
-Animal Business Complaint,human,maybe,yes,business,Chicago,-
-CDOT Construction Complaints,human,maybe,yes,construction,Chicago,-
-Check for Leak,non-human,no,no,building concern/code violation,Chicago,-
-Crisis Referral,human,no,no,health concern/public safety,Chicago,-
-Fly Dump (Tires),human,yes,yes,waste/cleanup services,Chicago,-
-Missing Lid/Grate/Cover,non-human,no,no,city infrastructure,Chicago,-
-Request Water Shut-Off Occupied Building,non-human,no,no,utilities request/concern,Chicago,-
-Request Water Shut-off Vacant Building,non-human,no,yes,utilities request/concern,Chicago,-
-Shelter Request,human,no,no,housing,Chicago,-
-"Sign - Loading or Standing Zone (New Installation, Amendment, Removal)",non-human,no,no,roadway/roadway lighting,Chicago,-
-Street Paint Marking Maintenance,non-human,no,no,roadway/roadway lighting,Chicago,-
-Tree Emergency,non-human,no,no,landscaping request/concern,Chicago,-
-Unwanted Animal,non-human,no,maybe,animal,Chicago,-
-Wildlife Assistance in Living Quarters,non-human,no,no,animal,Chicago,-
-Wire Down,non-human,no,no,utilities request/concern,Chicago,-
-Blocked Driveway & Illegal Parking,human,yes,yes,blocked passage,San Francisco,-
-Blocked Pedestrian Walkway,human,maybe,yes,blocked passage,San Francisco,-

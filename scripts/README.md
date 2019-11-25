@@ -22,4 +22,6 @@ The `311` scripts folder contains the following scripts to aid in pulling 311 ca
 
 * __join_census.py__: This is the streaming alternative to `get_census_tract_batch.py` should a streaming approach be preffered due to scale limitations. This file uses census tracts to match each call with relevant census demographic data.
 
-* __find_complatint_categories.R__: This script cleans and categorizes the joined 311/census data, categorizing calls by whether or not they were human-oriented, adversarial, etc. Ideally, this script is the last before analysis begins meaning any final cleaning should be done here. Categorization of calls was done manually by the team in [Google Sheets](https://docs.google.com/spreadsheets/d/16_G3nBNMg3H88tBs2i8BO1enHWza5p8tyM_giACXvPM/edit?usp=sharing).
+* __find_complaint_categories.R__: This script categorizes the joined 311/census data, categorizing calls by whether or not they were human-oriented, adversarial, etc. This script feeds data into the `final_clean.R` script below, which cleans and preps the data prior to writing it out and loading it for the analysis scripts. Categorization of calls was done manually by the team in [Google Sheets](https://docs.google.com/spreadsheets/d/16_G3nBNMg3H88tBs2i8BO1enHWza5p8tyM_giACXvPM/edit?usp=sharing).
+
+* __final_clean.R__: This script performs a final cleaning and prepping of the data prior to analysis. It keeps the data loaded in the environment to reduce time loading in, but also writes out the files for later use in other software.
