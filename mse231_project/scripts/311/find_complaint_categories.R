@@ -12,6 +12,8 @@
 path_categories <- "https://docs.google.com/spreadsheets/d/16_G3nBNMg3H88tBs2i8BO1enHWza5p8tyM_giACXvPM/edit#gid=0"
 path_data_shapefiles <- paste0(project_dir, "/data_raw/311/joined/", data_name, ".shp")
 
+print("Getting info to match calls to request categories...")
+
 ### Load  and Join Data
 data_categories <- 
     path_categories %>% 
@@ -23,5 +25,7 @@ data <-
     st_read() %>% 
     mutate(city = str_extract(city, pattern = ".+(?=[,_])")) %>% 
     left_join(data_categories, by = c("city", "service_na" = "req_name"))
+
+print("Finished matching calls to complaint categories, will clean data now...")
 
 rm("path_categories", "path_data_shapefiles", "data_categories")

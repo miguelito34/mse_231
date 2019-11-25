@@ -19,8 +19,10 @@ After running the relevant scripts per the in the project README, the `311` data
     * _Request aim (`req_aim`)_: This denotes the target of the request, whether a human (themselves, their actions, or their belongings) or a non-human entity.
     * _Legality of the event/concern reported (`legal`)_: This denotes whether or not the reported incident/concern regards a potentially illegal matter such as illegal graffiti, trash dumping, parking, etc.
     * _Adversarial nature of request (`adv`)_: This denotes whether or not a given request is adversarial to another person (themselves, their actions, their belongings of that being, or the area that that being resides in/near). In this case, we are referring to fellow citizens, and not neccessarily city entities, or citizens working on behalf of the government.
-    * _Categorized topic of request (`topic`)_: This denotes the umbrella category that a given request was grouped under. While we strived to make these grouping mutually exclusive and collectively exhaustive, they may not always be. 
-
-* __<data_version>_clean.tsv__: Prepped and cleaned data ready for analysis. A version with shapefiles can be found in the `.shp` file below.
+    * _Categorized topic of request (`topic`)_: This denotes the umbrella category that a given request was grouped under. While we strived to make these grouping mutually exclusive and collectively exhaustive, they may not always be.
     
-* __<data_version>_clean.shp__: Prepped and cleaned 311 data ready for analysis; includes shapefiles.
+Within each subfolder are data files for that city:
+
+* __<data_version>_census.tsv__: Prepped and cleaned data ready for analysis. A version with shapefiles can be found in the `.shp` file below.
+    
+* __<data_version>_census.shp__: Prepped and cleaned 311 data ready for analysis; includes shapefiles.
