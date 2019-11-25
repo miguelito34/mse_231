@@ -119,7 +119,11 @@ Rscript scripts/311/final_clean.R
 
 This script outputs the prepped data to `data/311/<data_version>_clean` and produces both a `.shp` and `.tsv` file to suit your needs.
 
-7. Replicate the analysis (To Come)
+7. Replicate the analysis or start your own
+
+To replicate the analysis thus far open the `analysis/exploratory_analysis.Rmd` markdown document in RStudio.
+
+To perform your own analysis, you can start with the template at `analysis/template_exploratory_analysis.Rmd` by opening it in RStudio. The code already written will load the neccessary packages to read in and clean the data for analysis. Some of the data is pulled from a google sheet that the team maintains. Upon running the script, you may be asked to authenticate your google account. Doing so gives the `googlesheets4` package, which is used to pull the data, permission to access the sheet. Please follow the instructions.
 
 ### Approach and Strategy (To Come)
 
