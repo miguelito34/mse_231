@@ -59,10 +59,10 @@ The data for this project are pulled from many different sources. You can find a
 * __311 Data__: 311 data was pulled using the [open311](https://www.open311.org/) database. The cities used in the analysis can be found below. 
 	* San Francisco, CA
 	* Chicago, IL
-	* Peoria, IL
-	* Bloomington, IN
+	* Peoria, IL (Pending)
+	* Bloomington, IN (Pending)
 	* Boston, MA
-	* Brookline, MA
+	* Brookline, MA (Pending)
 
 * __The US Census__: Data was pulled from the [US Census](https://data.census.gov/cedsci/?intcmp=aff_cedsci_banner) via the R package [tidycensus](https://walkerke.github.io/tidycensus/), which allows for easy access to the Census API.
 
@@ -79,51 +79,36 @@ Rscript scripts/census/pull_census_data.R
 
 2. View the available 311 service requests
 
-To see the available service requests in each city, run the following python script from within the project directory:
-```
-python3 scripts/311/open311_get_service_list.py
-```
+To see the available service requests in each city, visit the teams [working Google Sheet](https://docs.google.com/spreadsheets/d/16_G3nBNMg3H88tBs2i8BO1enHWza5p8tyM_giACXvPM/edit?usp=sharing)
 
-3. Download a sample of the available 311 calls
+3. 311 call data has been streamed and is available in `data_raw/311/unjoined/`. 
 
-Adjusts to this step will be made as the quantity of calls available/needed changes. In the future, this step will likely be piped into the following step so as to output a single file that includes the calls as well as their census tracts. To replicate, run the script as below:
-```
-python3 scripts/311/open311_pull_all_data.py > data_raw/311/unjoined/<data_version>.tsv
-```
-
-The output data will be in `data_raw/311/unjoined/`.
+The next steps can be easily carried out on your local computer and rely on the provided raw data.
 
 4. Locate each call
 
 In order to perform any significant analysis, we must join this call data with census data. We'll be doing this at the level of census tracts. This script will pair each call with it's relevant geoid, allowing us to join the call with census data in later steps. In this step, we discard any calls for which the location cannot be determined by lat/long.
 
-Adjustements will need to be made to the script depending on what you name the call file above. Namely, you'll have to ensure the script reads in the right file. Also change the name of the files written out to correspond.
+Current options for analysis are:
+
+* San Francisco - "SFO"
+* Chicago - "CHI"
+
 ```
-python3 scripts/311/get_census_tract_batch.py
+python3 scripts/311/get_census_tract_batch.py <city abb>
 ```
 The output data will be in `data_raw/311/joined/`.
 
-5. Determine categorization for each call
+6. Replicate the analysis or start your own
 
-To carry out a substantive analysis, we categorize each service request into various categories such as whether or not it is human focused, whether it is adversarial, etc. Run the command below to run this script.
-
+Now that you have all the data you will need, to replicate the analysis thus far run the following, substituting `<city abb>` for a city of your choosing and `<write full data>` with either "yes" or "no" depending on if you'd like to write out the full dataset for that city:
 ```
-Rscript scripts/311/find_complaint_categories.R
-```
-
-6. Perform final cleaning and prepping of the data. This will write out the relevant files. If you wish to re-run analysis, you should skip this step and run the analysis script below, which auto-runs the cleaning script. 
-
-```
-Rscript scripts/311/final_clean.R
+bash render_report <city abb> <write full data>
 ```
 
-This script outputs the prepped data to `data/311/<data_version>_clean` and produces both a `.shp` and `.tsv` file to suit your needs.
-
-7. Replicate the analysis or start your own
-
-To replicate the analysis thus far run the following, substituting `<city abbreviation>` for a city of your choosing:
+Example:
 ```
-Rscript -e "rmarkdown::render('analysis/exploratory_analysis.Rmd', params=list(city = '<city abbreviation>'))"
+bash render_report CHI no
 ```
 
 To perform your own analysis, you can start with the template at `analysis/template_exploratory_analysis.Rmd` by opening it in RStudio. The code already written will load the neccessary packages to read in and clean the data for analysis. Some of the data is pulled from a google sheet that the team maintains. Upon running the script, you may be asked to authenticate your google account. Doing so gives the `googlesheets4` package, which is used to pull the data, permission to access the sheet. Please follow the instructions.

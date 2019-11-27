@@ -7,6 +7,7 @@ import pandas as pd
 from shapely.geometry import Point
 import os
 import rtree
+import sys
 
 # Parameters
 PROJECT_PATH = os.getcwd()
@@ -16,7 +17,7 @@ PROJECT_PATH = os.getcwd()
 #census_tracts = gpd.read_file(r'data/census/census_data_shapefiles.shp')[['geoid', 'geometry']] # Use this to drop columns
 census_tracts = gpd.read_file(r'data/census/census_data_shapefiles.shp') # Use this to keep all columns, i.e. if doing things entirely in memory
 
-calls = pd.read_csv(r'data_raw/311/unjoined/CHI_data.tsv', sep = "\t")
+calls = pd.read_csv((r'data_raw/311/unjoined/' + sys.argv[1] + '_data.tsv'), sep = "\t")
 calls = (calls[calls.lat.notnull() & calls.long.notnull()]
          .drop_duplicates()
          .drop(['service_request_id', 'service_code'], axis = 1)
@@ -36,4 +37,4 @@ located_311_data = (sjoin(gdf, census_tracts, how = 'left')
                     .merge(census_tracts[['geoid', 'geometry']], on = "geoid")
                    )
 
-located_311_data.to_file((PROJECT_PATH + '/data_raw/311/joined/CHI_data_census.shp'))
+located_311_data.to_file((PROJECT_PATH + '/data_raw/311/joined/' + sys.argv[1] + '_data_census.shp'))
