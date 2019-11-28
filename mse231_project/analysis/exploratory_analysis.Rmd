@@ -4,7 +4,8 @@ author: "Michael Spencer, "
 date: "11/21/2019"
 output: pdf_document
 params:
-  city: "CHI"
+  city: "SFO"
+  write: "no"
 ---
 
 ```{r setup, include=FALSE}
@@ -22,7 +23,7 @@ data_name <- paste0(data_city, "_data_census")
 
 ### Parameters
 ```{r}
-write_my_files <- "no" # If you'd like to write out a .shp and .tsv file, use "yes", otherwise "no".
+write_my_files <- params$write # If you'd like to write out a .shp and .tsv file, use "yes", otherwise "no".
 ```
 
 ### Sourcing and Libraries
@@ -43,6 +44,41 @@ library(googlesheets4)
 ### Source prep and cleaning files to load data
 source(paste0(project_dir, "/scripts/311/final_clean.R"))
 ```
+
+## Checks
+```{r, echo=FALSE}
+# Check for uncategorized service requests and notify user
+data_temp <- 
+	data_calls %>% 
+	filter(is.na(topic)) %>% 
+	distinct(srvc_nm)
+
+if (nrow(data_temp) > 0) {
+	print(paste0(
+		"There are currently ", 
+		nrow(data_temp), 
+		" uncategorized services in ", 
+		data_city, 
+		". See them below:"))
+	
+	for (i in data_temp) {
+		print(i)
+	}
+} else {
+	print("All services in the data have been classified!")
+}
+```
+
+Potential duplicates. These are only adressed if it is believed they would present a significant issue in analysis.
+```{r}
+# Check for apparent duplicates and address if there is a problem
+data_calls %>% 
+	group_by(address, req_dt, updt_dt, topic) %>% 
+	count(sort = TRUE) %>% 
+	filter(n > 1) %>% 
+	knitr::kable()
+```
+
 
 ## Analysis
 

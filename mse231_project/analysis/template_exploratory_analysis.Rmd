@@ -1,10 +1,11 @@
 ---
-title: "Exploratory Analysis Template"
+title: "Template 311 Exploratory Analysis"
 author: "Michael Spencer"
 date: "11/24/2019"
 output: pdf_document
 params:
   city: "CHI"
+  write: "no"
 ---
 
 ```{r setup, include=FALSE}
@@ -41,5 +42,5 @@ if (!require(googlesheets4)) install.packages("googlesheets4")
 library(googlesheets4)
 
 ### Source prep and cleaning files to load data
-source(paste0(project_dir, "/scripts/311/final_clean.R"))
+#source(paste0(project_dir, "/scripts/311/final_clean.R"))
 ```
