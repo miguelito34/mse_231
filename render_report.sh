@@ -1,1 +1,0 @@
-Rscript -e "rmarkdown::render('analysis/exploratory_analysis.Rmd', params=list(city = '$1', write = '$2'), output_file = 'exploratory_analysis_$1.pdf')"
