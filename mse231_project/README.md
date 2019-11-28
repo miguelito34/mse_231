@@ -56,7 +56,7 @@ Follow the relevant links to sign up for any needed credentials you don't alread
 
 The data for this project are pulled from many different sources. You can find a link to each source below:
 
-* __311 Data__: 311 data was pulled using the [open311](https://www.open311.org/) database. The cities used in the analysis can be found below. 
+* __311 Data__: 311 data was pulled using the [open311](https://www.open311.org/) database. The cities used in the analysis can be found below.
 	* San Francisco, CA
 	* Chicago, IL
 	* Peoria, IL (Pending)
@@ -81,7 +81,7 @@ Rscript scripts/census/pull_census_data.R
 
 To see the available service requests in each city, visit the teams [working Google Sheet](https://docs.google.com/spreadsheets/d/16_G3nBNMg3H88tBs2i8BO1enHWza5p8tyM_giACXvPM/edit?usp=sharing)
 
-3. 311 call data has been streamed and is available in `data_raw/311/unjoined/`. 
+3. 311 call data has been streamed and is available in `data_raw/311/unjoined/`.
 
 The next steps can be easily carried out on your local computer and rely on the provided raw data.
 
@@ -99,7 +99,7 @@ python3 scripts/311/get_census_tract_batch.py <city abb>
 ```
 The output data will be in `data_raw/311/joined/`.
 
-6. Replicate the analysis or start your own
+5. Replicate the analysis or start your own
 
 Now that you have all the data you will need, to replicate the analysis thus far run the following, substituting `<city abb>` for a city of your choosing and `<write full data>` with either "yes" or "no" depending on if you'd like to write out the full dataset for that city:
 ```
