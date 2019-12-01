@@ -174,4 +174,4 @@ data_calls <-
 
 print("You're all set!")
 
-rm("write_my_files", "rename_data", "rectify_columns", "data", "data_write")
+rm("rename_data", "rectify_columns", "data", "data_write")

@@ -12,23 +12,28 @@ params:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Setup
-
-### Pathways
-```{r}
+```{r, include=FALSE}
+# Pathways
 project_dir <- here::here()
 data_city <- params$city
 data_name <- paste0(data_city, "_data_census")
 ```
 
-### Parameters
-```{r}
-write_my_files <- params$write # If you'd like to write out a .shp and .tsv file, use "yes", otherwise "no".
+```{r, include=FALSE}
+# Parameters
+write_my_files <- params$write
+
+race_colors <- 
+  c(
+    "White" = "darkblue", 
+    "Hispanic" = "orange", 
+    "African American" = "maroon", 
+    "Asian" = "darkgreen"
+  )
 ```
 
-### Sourcing and Libraries
 ```{r, include=FALSE}
-### Libraries
+# Sourcing and Libraries
 if (!require(sf)) install.packages("sf")
 library(sf)
 
@@ -41,12 +46,20 @@ library(lubridate)
 if (!require(googlesheets4)) install.packages("googlesheets4")
 library(googlesheets4)
 
-### Source prep and cleaning files to load data
+# Source prep and cleaning files to load data
 source(paste0(project_dir, "/scripts/311/final_clean.R"))
+
+# Source file to write out summarized geojson file
+if (write_my_files == "yes") {
+	source(paste0(project_dir, "/scripts/311/shp_to_geojson.R"))
+}
+
+# Source support functions
+source(paste0(project_dir, "/analysis/support_functions.R"))
 ```
 
 ## Checks
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 # Check for uncategorized service requests and notify user
 data_temp <- 
 	data_calls %>% 
@@ -70,22 +83,21 @@ if (nrow(data_temp) > 0) {
 ```
 
 Potential duplicates. These are only adressed if it is believed they would present a significant issue in analysis.
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 # Check for apparent duplicates and address if there is a problem
 data_calls %>% 
 	group_by(address, req_dt, updt_dt, topic) %>% 
-	count(sort = TRUE) %>% 
-	filter(n > 1) %>% 
+	count(sort = TRUE, name = "instances") %>% 
+	filter(instances > 1) %>% 
 	knitr::kable()
 ```
-
 
 ## Analysis
 
 ### Base Benchmark Analysis (Non-Geographic)
 
 ##### What is the distribution of call by topic?
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 data_calls %>%
   count(topic, sort = TRUE) %>%
   mutate(prop_total = (n / sum(n)) %>% round(digits = 3)) %>%
@@ -109,7 +121,7 @@ data_calls %>%
   )
 ```
 
-##### Within each topic, what are the most frequent services requested?
+##### Within the top five topics, what are the most frequent services requested?
 ```{r, include=FALSE}
 data_temp <-
   data_calls %>%
@@ -126,8 +138,9 @@ data_temp <-
 data_temp
 ```
 
-```{r, echo=FALSE}
-list_topics <- data_temp %>%
+```{r, echo=FALSE, warning=FALSE}
+list_topics <- 
+	data_temp %>%
   distinct(topic) %>%
   pull(topic)
 
@@ -141,17 +154,17 @@ plot_top_services <- function(tp) {
     coord_flip() +
     scale_y_continuous(labels = scales::percent_format()) +
     labs(
-      title = paste0("Frequently Requested Services: ", tp %>% str_to_title()),
+      title = paste0("Frequently Requested Services:\n", tp %>% str_to_title()),
       x = "Requested Service",
       y = paste0("Proportion of Total Requests in Topic")
     )
 }
 
-map(list_topics, plot_top_services)
+map(head(list_topics), plot_top_services)
 ```
 
 ##### What is the proportion of requests that may be adversarial by topic?
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 # Excludes "maybe" adversarial in calculations.
 
 data_calls %>%
@@ -171,7 +184,7 @@ data_calls %>%
 ```
 
 ##### What is the proportion of requests that may involve illegal acitivity by topic?
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 # Excludes "maybe" illegal in calculations.
 
 data_calls %>%
@@ -191,26 +204,581 @@ data_calls %>%
 ```
 
 ##### What is the average time needed to close a request pertaining to something potentially illegal?
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 # This needs mroe thinking through, as there is bound to be extraneous data here.
+data_temp <-
+	data_calls %>%
+	filter(fix_min > 525600) %>% 
+	count()
 
-# data_calls %>% 
-# 	summary()
-# 
-# data_calls %>% 
-# 	mutate()
+print(paste0(data_temp, " calls took more than a year to fix and were thus filtered out here."))
 
 data_calls %>% 
-	filter(status == "closed", fix_min < 300000) %>%
+	filter(status == "closed", fix_min < 525600) %>%
 	group_by(illegal) %>% 
 	summarise(
 		avg_minutes_to_close = mean(fix_min, na.rm = TRUE),
 		avg_hours_to_close = avg_minutes_to_close / 60,
 		avg_days_to_close = avg_hours_to_close / 24
+	) %>% 
+	knitr::kable()
+```
+
+##### What is the average time needed to close a request by topic?
+```{r, echo=FALSE, warning=FALSE}
+data_calls %>% 
+	filter(status == "closed", fix_min < 525600) %>%
+	group_by(topic) %>% 
+	filter(illegal != "maybe") %>% 
+	summarise(
+		total_num = n(),
+		avg_minutes_to_close = mean(fix_min, na.rm = TRUE),
+		avg_hours_to_close = avg_minutes_to_close / 60,
+		avg_days_to_close = avg_hours_to_close / 24
+	) %>% 
+	arrange(avg_days_to_close) %>% 
+	knitr::kable()
+```
+
+### Geographic Analysis
+
+```{r, include=FALSE}
+# Prep Summary Data
+data_summary <-
+	data_calls %>% 
+	group_by(geoid, topic) %>% 
+	summarize(
+		num_topic = n(),
+		human = sum(req_aim == "human", na.rm = TRUE),
+		non_human = sum(req_aim == "non-human", na.rm = TRUE),
+		illegal = sum(illegal == "yes", na.rm = TRUE),
+		not_illegal = sum(illegal == "no", na.rm = TRUE),
+		adversarial = sum(adv == "yes", na.rm = TRUE),
+		not_adversarial = sum(adv == "no", na.rm = TRUE)
+	) %>% 
+	mutate(
+		total_reqs = sum(num_topic, na.rm = TRUE),
+		prop_human = sum(human, na.rm = TRUE)/total_reqs,
+		prop_nonhuman = sum(non_human, na.rm = TRUE)/total_reqs,
+		prop_illegal = sum(illegal, na.rm = TRUE)/total_reqs,
+		prop_legal = sum(not_illegal, na.rm = TRUE)/total_reqs,
+		prop_adv = sum(adversarial, na.rm = TRUE)/total_reqs,
+		prop_not_adv = sum(not_adversarial, na.rm = TRUE)/total_reqs
+	) %>% 
+	group_by(topic) %>% 
+	mutate(prop_topic = num_topic/total_reqs) %>% 
+	select(-num_topic, -human, -non_human, -illegal, -not_illegal, -adversarial, -not_adversarial) %>% 
+	ungroup() %>% 
+	spread(topic, prop_topic) %>% 
+	# Join data with census metrics
+	left_join(data_descriptive, by = "geoid") %>% 
+	mutate(avg_num_reqs = total_reqs/pop_tot)
+```
+
+#### Volume of  Calls
+#### =>Relationship Between Race and Volume of Calls
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(avg_num_reqs <= find_outlier("avg_num_reqs")) %>% 
+	ggplot(aes(x = pop_wht, y = avg_num_reqs)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(aes(group = cut_width(pop_wht, .1)), alpha = .2) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("avg_num_reqs"),
+    labels = scales::number_format(accuracy = .01)
+  ) +
+  scale_x_continuous(
+  	breaks = seq(0, 1, .1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("White Population vs. Avg. Volume of 311 Requests in ", data_city),
+		x = "Proportion of the Population that is\nWhite Alone (Non-Hispanic)",
+		y = "Number of 311 Requests per Person",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
 	)
 ```
 
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(
+		avg_num_reqs <= find_outlier("avg_num_reqs"),
+		pop_blk <= find_outlier("pop_blk")
+	) %>% 
+	ggplot(aes(x = pop_blk, y = avg_num_reqs)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(aes(group = cut_width(pop_blk, .1)), alpha = .2) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("avg_num_reqs"),
+    labels = scales::number_format(accuracy = .01)
+  ) +
+  scale_x_continuous(
+  	breaks = seq(0, 1, .1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("African American Population vs. Avg. Volume of 311 Requests in ", data_city),
+		x = "Proportion of the Population that is\nAfrican American Alone (Non-Hispanic)",
+		y = "Number of 311 Requests per Person",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
 
-##### What is the average time needed to close a request by topic?
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(avg_num_reqs <= find_outlier("avg_num_reqs")) %>%
+	select(
+		avg_num_reqs, 
+		"White" = pop_wht, 
+		"African American" = pop_blk, 
+		"Hispanic" = pop_his,
+		"Asian" = pop_asi
+	) %>% 
+	gather(key = "race", value = "prop", -avg_num_reqs) %>% 
+	ggplot(aes(x = prop, y = avg_num_reqs)) +
+	geom_point(alpha = .04) +
+	geom_boxplot(aes(group = cut_width(prop, .1)), alpha = .2) +
+	geom_smooth(aes(color = race), method = "loess", se = FALSE) +
+	scale_y_continuous(
+		breaks = get_breaks("avg_num_reqs"),
+    labels = scales::number_format(accuracy = .01)
+  ) +
+  scale_x_continuous(
+  	breaks = seq(0, 1, .1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+	scale_color_manual(
+    values = race_colors
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("Racial Makeup vs. Avg. Volume of 311 Requests in ", data_city),
+		x = "Proportion of the Population that is a Given Race",
+		y = "Number of 311 Requests per Person",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size.",
+		color = "Race/Ethinicity"
+	)
+```
 
-### Geographic Analysis
+#### =>Relationship Between Home Value/Rent and Volume of Calls
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(
+		avg_num_reqs <= find_outlier("avg_num_reqs"), 
+		med_val <= find_outlier("med_val")
+	) %>%
+	ggplot(aes(x = med_val, y = avg_num_reqs)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(
+		aes(group = cut_width(med_val, get_break_width("med_val"))),
+		alpha = .2
+	) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("avg_num_reqs"),
+    labels = scales::number_format(accuracy = .01)
+  ) +
+  scale_x_continuous(
+  	breaks = get_breaks("med_val"),
+    labels = scales::comma_format(accuracy = 1000, prefix = "$")
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("Median Home Value vs. Avg. Volume of 311 Requests in ", data_city),
+		x = "Median Home Value ($)",
+		y = "Number of 311 Requests per Person",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(
+		avg_num_reqs <= find_outlier("avg_num_reqs"), 
+		med_ren <= find_outlier("med_ren")
+	) %>%
+	ggplot(aes(x = med_ren, y = avg_num_reqs)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(
+		aes(group = cut_width(med_ren, get_break_width("med_ren"))),
+		alpha = .2
+	) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("avg_num_reqs"),
+    labels = scales::number_format(accuracy = .01)
+  ) +
+  scale_x_continuous(
+  	breaks = get_breaks("med_ren"),
+    labels = scales::comma_format(accuracy = 100, prefix = "$")
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("Median Rent vs. Avg. Volume of 311 Requests in ", data_city),
+		x = "Median Rent ($)",
+		y = "Number of 311 Requests per Person",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+#### =>Relationship Between Education and Volume of Calls
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	mutate(college_educated = ed_grad + ed_bs + ed_as) %>% 
+	filter(
+		avg_num_reqs <= find_outlier("avg_num_reqs")
+	) %>%
+	ggplot(aes(x = college_educated, y = avg_num_reqs)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(
+		aes(group = cut_width(college_educated, .1)),
+		alpha = .2
+	) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("avg_num_reqs"),
+    labels = scales::number_format(accuracy = .01)
+  ) +
+  scale_x_continuous(
+  	breaks = seq(0, 1, .1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("Proportion College Educated vs. Avg. Volume of 311 Requests in ", data_city),
+		x = "Proportion College Educated",
+		y = "Number of 311 Requests per Person",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+#### =>Relationship Between Employment and Volume of Calls
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(
+		avg_num_reqs <= find_outlier("avg_num_reqs"),
+		emp_une <= find_outlier("emp_une")
+	) %>%
+	ggplot(aes(x = emp_une, y = avg_num_reqs)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(
+		aes(group = cut_width(emp_une, .05)),
+		alpha = 0
+	) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("avg_num_reqs"),
+    labels = scales::number_format(accuracy = .01)
+  ) +
+  scale_x_continuous(
+  	breaks = seq(0, 1, .05),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("Unemployment Rate vs. Avg. Volume of 311 Requests in ", data_city),
+		x = "Unemployment Rate",
+		y = "Number of 311 Requests per Person",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+#### Adversarial Calls
+#### =>Relationship Between Race and Adversarial Calls
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(prop_adv <= find_outlier("prop_adv")) %>% 
+	ggplot(aes(x = pop_wht, y = prop_adv)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(aes(group = cut_width(pop_wht, .1)), alpha = .2) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("prop_adv"),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_x_continuous(
+  	breaks = seq(0, 1, .1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("White Population vs. Proportion of Adversarial 311 Requests in ", data_city),
+		x = "Proportion of the Population that is\nWhite Alone (Non-Hispanic)",
+		y = "Proportion of 311 Requests\nDesignated Adversarial",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(prop_adv <= find_outlier("prop_adv")) %>% 
+	ggplot(aes(x = pop_nw, y = prop_adv)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(aes(group = cut_width(pop_nw, .1)), alpha = .2) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("prop_adv"),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_x_continuous(
+  	breaks = seq(0, 1, .1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("Non-White Population vs. Proportion of Adversarial 311 Requests in ", data_city),
+		x = "Proportion of the Population that is\nNon-White Alone",
+		y = "Proportion of 311 Requests\nDesignated Adversarial",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(
+		prop_adv <= find_outlier("prop_adv"),
+		pop_blk <= find_outlier("pop_blk")
+	) %>% 
+	ggplot(aes(x = pop_blk, y = prop_adv)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(aes(group = cut_width(pop_blk, .1)), alpha = .2) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("prop_adv"),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_x_continuous(
+  	breaks = seq(0, 1, .1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("African American Population vs. Proportion of Adversarial 311 Requests\nin ", data_city),
+		x = "Proportion of the Population that is\nAfrican American Alone (Non-Hispanic)",
+		y = "Proportion of 311 Requests\nDesignated Adversarial",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(prop_adv <= find_outlier("prop_adv")) %>% 
+	select(
+		prop_adv, 
+		"White" = pop_wht, 
+		"African American" = pop_blk, 
+		"Hispanic" = pop_his,
+		"Asian" = pop_asi
+	) %>% 
+	gather(key = "race", value = "prop", -prop_adv) %>% 
+	ggplot(aes(x = prop, y = prop_adv)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(aes(group = cut_width(prop, .1)), alpha = .2) +
+	geom_smooth(method = "loess", se = FALSE) +
+	scale_y_continuous(
+		breaks = get_breaks("prop_adv"),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_x_continuous(
+  	breaks = seq(0, 1, .1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+	facet_wrap(~race, scales = "free_x") +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("Racial/Ethnic Population vs. Proportion of Adversarial 311 Requests\nin ", data_city),
+		x = "Proportion of the Population that is\nA Given Race/Ethnicity",
+		y = "Proportion of 311 Requests\nDesignated Adversarial",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+#### =>Relationship Between Home Value/Rent and Adversarial Calls
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(
+		prop_adv <= find_outlier("prop_adv"), 
+		med_val <= find_outlier("med_val")
+	) %>%
+	ggplot(aes(x = med_val, y = prop_adv)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(
+		aes(group = cut_width(med_val, get_break_width("med_val"))),
+		alpha = .2
+	) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("prop_adv"),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_x_continuous(
+  	breaks = get_breaks("med_val"),
+    labels = scales::comma_format(accuracy = 1000, prefix = "$")
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("Median Home Value vs. Proportion of Adversarial 311 Requests in\n", data_city),
+		x = "Median Home Value ($)",
+		y = "Proportion of 311 Requests\nDesignated Adversarial",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(
+		prop_adv <= find_outlier("prop_adv"), 
+		med_ren <= find_outlier("med_ren")
+	) %>%
+	ggplot(aes(x = med_ren, y = prop_adv)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(
+		aes(group = cut_width(med_ren, get_break_width("med_ren"))),
+		alpha = .2
+	) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("prop_adv"),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_x_continuous(
+  	breaks = get_breaks("med_ren"),
+    labels = scales::comma_format(accuracy = 100, prefix = "$")
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("Median Rent vs. Proportion of Adversarial 311 Requests in\n", data_city),
+		x = "Median Rent ($)",
+		y = "Proportion of 311 Requests\nDesignated Adversarial",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+#### =>Relationship Between Education and Adversarial Calls
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	mutate(college_educated = ed_grad + ed_bs + ed_as) %>% 
+	filter(
+		prop_adv <= find_outlier("prop_adv")
+	) %>%
+	ggplot(aes(x = college_educated, y = prop_adv)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(
+		aes(group = cut_width(college_educated, .1)),
+		alpha = .2
+	) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("prop_adv"),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_x_continuous(
+  	breaks = seq(0, 1, .1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("Proportion College Educated vs. Proportion of Adversarial\n 311 Requests in ", data_city),
+		x = "Proportion College Educated",
+		y = "Proportion of 311 Requests\nDesignated Adversarial",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+#### =>Relationship Between Employment and Adversarial Calls
+```{r, echo=FALSE, warning=FALSE}
+data_summary %>% 
+	filter(
+		prop_adv <= find_outlier("prop_adv"),
+		emp_une <= find_outlier("emp_une")
+	) %>%
+	ggplot(aes(x = emp_une, y = prop_adv)) +
+	geom_point(alpha = .08) +
+	geom_boxplot(
+		aes(group = cut_width(emp_une, .05)),
+		alpha = 0
+	) +
+	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
+	scale_y_continuous(
+		breaks = get_breaks("prop_adv"),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_x_continuous(
+  	breaks = seq(0, 1, .05),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+	theme(
+    panel.background = element_rect(fill = "white"),
+    panel.grid = element_line(color = "gray95"),
+    plot.caption = element_text(hjust = 0)
+  ) +
+	labs(
+		title = paste0("Unemployment Rate vs. Proportion of Adversarial\n 311 Requests in ", data_city),
+		x = "Unemployment Rate",
+		y = "Proportion of 311 Requests\nDesignated Adversarial",
+		caption = "Note: Be wary of drawing comparisons to other cities as the data may come from different time periods.\nDensity of background points indicate sample size."
+	)
+```
+
+### Mapping
+

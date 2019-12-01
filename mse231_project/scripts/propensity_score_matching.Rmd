@@ -1,0 +1,87 @@
+---
+title: "Tract Matching"
+output: html_document
+---
+
+```{r}
+city_data = read.csv("../../local/CHI_SFO_data_census.tsv", sep = "\t")
+census_data = read.csv("../data/census/census_data.tsv", sep = "\t")
+```
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+#city_data_n30_sub <- city_data %>%
+#  group_by(geoid) %>%
+#  filter(n() > 30)
+```
+
+```{r}
+city_geoids <- city_data %>%
+  group_by(geoid) %>%
+  filter(n() > 30) %>%
+  select(geoid) %>%
+  distinct(geoid)
+```
+
+```{r}
+census_data_subset <- census_data %>%
+  filter(geoid %in% city_geoids$geoid)
+```
+
+```{r}
+nw_threshold = 0.6
+census_data_subset <- census_data_subset %>%
+  mutate(maj_nw = ifelse(pop_nw >= nw_threshold, 1, 0))
+
+census_data_subset <- census_data_subset[complete.cases(census_data_subset), ]
+sum(census_data_subset$maj_nw)
+nrow(census_data_subset)
+```
+
+```{r}
+library(MatchIt)
+match_vars <- c("ed_grad", "ed_bs", "med_inc", "med_val", "med_ren")
+match.out <- matchit(maj_nw ~ ed_grad + ed_bs + med_inc + med_val + med_ren, data = census_data_subset, replace = TRUE)
+```
+
+```{r}
+matches <- match.out$match.matrix
+```
+
+```{r}
+#install.packages("cobalt")
+library(cobalt)
+bal.tab(match.out, m.threshold = 0.2)
+bal.plot(match.out, var.name = 'ed_grad', which = 'both')
+bal.plot(match.out, var.name = 'ed_bs', which = 'both')
+bal.plot(match.out, var.name = 'med_inc', which = 'both')
+bal.plot(match.out, var.name = 'med_val', which = 'both')
+bal.plot(match.out, var.name = 'med_ren', which = 'both')
+love.plot(bal.tab(match.out, m.threshold = 0.2), stat = "mean.diffs")
+```
+
+```{r}
+df_matches <- match.data(match.out)
+lapply(match_vars, function(v) {
+    t.test(df_matches[, v] ~ df_matches$maj_nw)
+})
+df_matches %>%
+  group_by(maj_nw) %>%
+  select(one_of(match_vars)) %>%
+  summarise_all(funs(mean))
+```
+
+```{r}
+# EXAMPLE, need to join w/ 311 data first
+lm_model <- lm(c5r2mtsc_std ~ catholic + race_white + p5hmage +
+                  I(w3income / 10^3) + p5numpla + w3momed_hsb, data = dta_m)
+summary(lm_model)
+```
+
+
+
+
+

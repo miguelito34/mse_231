@@ -103,12 +103,12 @@ The output data will be in `data_raw/311/joined/`.
 
 Now that you have all the data you will need, to replicate the analysis thus far run the following, substituting `<city abb>` for a city of your choosing and `<write full data>` with either "yes" or "no" depending on if you'd like to write out the full dataset for that city:
 ```
-bash render_report <city abb> <write full data>
+bash render_report.sh <city abb> <write full data>
 ```
 
 Example:
 ```
-bash render_report CHI no
+bash render_report.sh CHI no
 ```
 
 To perform your own analysis, you can start with the template at `analysis/template_exploratory_analysis.Rmd` by opening it in RStudio. The code already written will load the neccessary packages to read in and clean the data for analysis. Some of the data is pulled from a google sheet that the team maintains. Upon running the script, you may be asked to authenticate your google account. Doing so gives the `googlesheets4` package, which is used to pull the data, permission to access the sheet. Please follow the instructions.
