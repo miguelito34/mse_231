@@ -2,86 +2,212 @@
 title: "Tract Matching"
 output: html_document
 ---
-
-```{r}
-city_data = read.csv("../../local/CHI_SFO_data_census.tsv", sep = "\t")
-census_data = read.csv("../data/census/census_data.tsv", sep = "\t")
-```
-
+# Prep
+## Imports
 ```{r}
 library(dplyr)
 ```
 
+## Pull city data sources
 ```{r}
-#city_data_n30_sub <- city_data %>%
-#  group_by(geoid) %>%
-#  filter(n() > 30)
+BOS_data_raw = read.csv("../../local/BOS_data_census.tsv", sep = "\t")
+CHI_data_raw = read.csv("../../local/CHI_data_census.tsv", sep = "\t")
+SFO_data_raw = read.csv("../../local/SFO_data_census.tsv", sep = "\t")
 ```
 
+## Pull census data
 ```{r}
-city_geoids <- city_data %>%
+df_census_raw = read.csv("../data/census/census_data.tsv", sep = "\t")
+```
+
+## Convert datetime columns to POSIXct
+```{r}
+BOS_data_raw$req_dt <- as.POSIXct(BOS_data_raw$req_dt,
+            format = "%Y-%m-%dT%H:%M:%SZ",
+            tz = "America/New_York")
+CHI_data_raw$req_dt <- as.POSIXct(CHI_data_raw$req_dt,
+            format = "%Y-%m-%dT%H:%M:%SZ",
+            tz = "America/Chicago")
+SFO_data_raw$req_dt <- as.POSIXct(SFO_data_raw$req_dt,
+            format = "%Y-%m-%dT%H:%M:%SZ",
+            tz = "America/Los_Angeles")
+
+BOS_data_raw$updt_dt <- as.POSIXct(BOS_data_raw$updt_dt,
+            format = "%Y-%m-%dT%H:%M:%SZ",
+            tz = "America/New_York")
+CHI_data_raw$updt_dt <- as.POSIXct(CHI_data_raw$updt_dt,
+            format = "%Y-%m-%dT%H:%M:%SZ",
+            tz = "America/Chicago")
+SFO_data_raw$updt_dt <- as.POSIXct(SFO_data_raw$updt_dt,
+            format = "%Y-%m-%dT%H:%M:%SZ",
+            tz = "America/Los_Angeles")
+```
+
+## Combine city data sources
+```{r}
+df_311_census <- dplyr::bind_rows(BOS_data_raw, CHI_data_raw, SFO_data_raw)
+```
+
+## Clear city data sources
+```{r}
+rm(BOS_data_raw, CHI_data_raw, SFO_data_raw)
+```
+
+## Remove any unneccesarry columns
+```{r}
+df_311_census <- subset(df_311_census, select = -c(address))
+```
+
+## Convert non-numeric columns to factors
+```{r}
+cols_to_convert_to_factor <- c("city", "status", "srvc_nm", "geoid", "detail", "st_fip", "cty_fip", "trt_fip", "state", "req_aim", "illegal", "adv", "topic")
+df_311_census[cols_to_convert_to_factor] <- lapply(df_311_census[cols_to_convert_to_factor], as.factor)
+```
+
+## Summarize full city data
+```{r}
+summary(df_311_census)
+```
+
+## Filter out tracts with n <= 30 data points
+```{r}
+(nrow(df_311_census))
+df_311_census <- df_311_census %>%
   group_by(geoid) %>%
-  filter(n() > 30) %>%
-  select(geoid) %>%
-  distinct(geoid)
+  filter(n() > 30)
+(nrow(df_311_census))
+```
+
+## Filter out tracts with no pop_nw data
+```{r}
+(nrow(df_311_census))
+df_311_census <- na.omit(df_311_census, cols="pop_nw")
+(nrow(df_311_census))
+```
+
+### Define treatment as 60%+ non-white tract (nw_60pct)
+```{r}
+nw_threshold = 0.60
+
+df_311_census <- df_311_census %>%
+  mutate(nw_60pct = ifelse(pop_nw >= nw_threshold, 1, 0))
 ```
 
 ```{r}
-census_data_subset <- census_data %>%
-  filter(geoid %in% city_geoids$geoid)
+(df_311_census %>%
+    group_by(city) %>%
+    count(nw_60pct))
+```
+
+## Find 311 requests per month per 1000 people (outcome)
+
+```{r}
+library(lubridate)
+df_311_census$req_dt <- as.Date(df_311_census$req_dt)
+df_311_census$updt_dt <- as.Date(df_311_census$updt_dt)
 ```
 
 ```{r}
-nw_threshold = 0.6
-census_data_subset <- census_data_subset %>%
-  mutate(maj_nw = ifelse(pop_nw >= nw_threshold, 1, 0))
-
-census_data_subset <- census_data_subset[complete.cases(census_data_subset), ]
-sum(census_data_subset$maj_nw)
-nrow(census_data_subset)
+df_311_monthly_full <- df_311_census %>%
+  group_by(month=floor_date(req_dt, "month")) %>%
+  count(geoid)
 ```
 
 ```{r}
-library(MatchIt)
-match_vars <- c("ed_grad", "ed_bs", "med_inc", "med_val", "med_ren")
-match.out <- matchit(maj_nw ~ ed_grad + ed_bs + med_inc + med_val + med_ren, data = census_data_subset, replace = TRUE)
+df_311_monthly_full <- df_311_monthly_full %>%
+  filter(month <= as.Date("2019-10-01"))
 ```
 
 ```{r}
-matches <- match.out$match.matrix
+avg_mon_reqs <- aggregate(df_311_monthly_full$n, by=list(geoid=df_311_monthly_full$geoid), mean)
 ```
 
 ```{r}
-#install.packages("cobalt")
-library(cobalt)
-bal.tab(match.out, m.threshold = 0.2)
-bal.plot(match.out, var.name = 'ed_grad', which = 'both')
-bal.plot(match.out, var.name = 'ed_bs', which = 'both')
-bal.plot(match.out, var.name = 'med_inc', which = 'both')
-bal.plot(match.out, var.name = 'med_val', which = 'both')
-bal.plot(match.out, var.name = 'med_ren', which = 'both')
-love.plot(bal.tab(match.out, m.threshold = 0.2), stat = "mean.diffs")
+df_census_raw$geoid <- as.factor(df_census_raw$geoid)
 ```
 
 ```{r}
-df_matches <- match.data(match.out)
-lapply(match_vars, function(v) {
-    t.test(df_matches[, v] ~ df_matches$maj_nw)
-})
-df_matches %>%
-  group_by(maj_nw) %>%
-  select(one_of(match_vars)) %>%
-  summarise_all(funs(mean))
+joined_by_geoid <- avg_mon_reqs %>%
+  left_join(df_census_raw, by = "geoid") %>%
+  distinct() %>%
+  mutate(reqs_per_mon_per_1k = 1000 * (x / pop_tot))
 ```
+
+# Naive approach
+
+## Look at plot
 
 ```{r}
-# EXAMPLE, need to join w/ 311 data first
-lm_model <- lm(c5r2mtsc_std ~ catholic + race_white + p5hmage +
-                  I(w3income / 10^3) + p5numpla + w3momed_hsb, data = dta_m)
-summary(lm_model)
+plot(joined_by_geoid$pop_wht, joined_by_geoid$reqs_per_mon_per_1k)
 ```
 
+## Investigate outliers
 
+```{r}
+requesting_outliers <- df_census_raw %>%
+  filter(geoid == 6075980900 | geoid == 6075017700)
+write.table(requesting_outliers, file = "requesting_outliers.tsv", row.names = FALSE, quote = FALSE, sep = "\t")
+```
 
+## Filter out outliers and re-plot on log scale
 
+```{r}
+joined_by_geoid <- joined_by_geoid %>%
+  filter(geoid != 6075980900 & geoid != 6075017700)
+plot(joined_by_geoid$pop_wht, joined_by_geoid$reqs_per_mon_per_1k, log = "y")
+```
 
+## Run naive OLS
+
+```{r}
+naive_OLS <- lm(reqs_per_mon_per_1k ~ pop_wht, data = joined_by_geoid)
+summary(naive_OLS)
+plot(joined_by_geoid$pop_wht, joined_by_geoid$reqs_per_mon_per_1k, log = "y")
+abline(naive_OLS, col = "blue", untf=TRUE)
+```
+
+Without controlling for other variables, we do not see a statistically significant relationship between pop_wht and reqs_per_mon_per_1k.
+
+## Run naive OLS with controls 
+
+```{r}
+naive_OLS_controls <- lm(reqs_per_mon_per_1k ~ pop_wht + ed_grad + ed_bs + med_inc + med_val + emp_une, data = joined_by_geoid)
+summary(naive_OLS_controls)
+plot(joined_by_geoid$pop_wht, joined_by_geoid$reqs_per_mon_per_1k, log = "y")
+abline(naive_OLS_controls, col = "blue", untf=TRUE)
+```
+
+With controls, we do see a statistically significant relationship between pop_wht and reqs_per_mon_per_1k.
+
+# Covariate balancing generalized propensity score (CBGPS)
+
+As demonstrated in Hirano and Imbens (2004), we can leverage propensity scores for continuous treatment if we assume weak unconfoundedness / ignorability $Y(t) \bot T |X \forall t \in T$ (adjusting for differences in a set of covariates removes all biases in comparisons by treatment status). As shown in Fong, Hazlett, and Imai (2018), we can leverage recent covariate balancing propensity score (CBPS) methodology, which "increases the robustness to model misspecification by directly optimizing sample covariate balance between the treatment and control groups" to the continuous treatment case (GPS), dubbed "covariate balancing generalized propensity score" (CBGPS) methodology.
+
+## CBGPS: within-city
+
+### Prep
+
+### Matching
+
+### Balance checks
+
+### Treatment effect estimation
+
+## CBGPS: across cities
+
+```{r}
+#install.packages("CBPS")
+library("CBPS")
+```
+
+"The propensity score is estimated such that it maximizes the resulting covariate balance as well as the prediction of treatment assignment. The method, therefore, avoids an iteration
+between model fitting and balance checking."
+
+```{r}
+cbgps <- CBPS(pop_wht ~ emp_une + ed_grad + ed_bs + ed_l_hs + med_inc + med_val + med_ren, data = joined_by_geoid, ATT = 0)
+summary(cbgps)
+cbgps_adj_model <- lm(reqs_per_mon_per_1k ~ pop_wht + emp_une + ed_grad + ed_bs + ed_l_hs + med_inc + med_val + med_ren, weights = cbps_model$weights, data = joined_by_geoid)
+summary(cbgps_adj_model)
+```
+
+With CBGPS, we do not see a statistically significant relationship between pop_wht and reqs_per_mon_per_1k.

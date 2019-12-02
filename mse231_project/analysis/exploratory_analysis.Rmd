@@ -1,6 +1,6 @@
 ---
 title: "311 Exploratory Analysis"
-author: "Michael Spencer, "
+author: "Michael Spencer, Andrew (Foster) Docherty, Jorge Nam Song, Lauren Feitzinger, Andrea Banuet"
 date: "11/21/2019"
 output: pdf_document
 params:
@@ -46,6 +46,12 @@ library(lubridate)
 if (!require(googlesheets4)) install.packages("googlesheets4")
 library(googlesheets4)
 
+if (!require(ggmap)) install.packages("ggmap")
+library(ggmap)
+
+if (!require(patchwork)) install.packages("patchwork")
+library(patchwork)
+
 # Source prep and cleaning files to load data
 source(paste0(project_dir, "/scripts/311/final_clean.R"))
 
@@ -87,11 +93,15 @@ Potential duplicates. These are only adressed if it is believed they would prese
 # Check for apparent duplicates and address if there is a problem
 data_calls %>% 
 	group_by(address, req_dt, updt_dt, topic) %>% 
-	count(sort = TRUE, name = "instances") %>% 
-	filter(instances > 1) %>% 
+	count(sort = TRUE, name = "n") %>% 
+	filter(n > 1) %>% 
+	ungroup() %>% 
+	select(-address) %>% 
+	head(100) %>% 
 	knitr::kable()
 ```
 
+\newpage
 ## Analysis
 
 ### Base Benchmark Analysis (Non-Geographic)
@@ -239,7 +249,7 @@ data_calls %>%
 	arrange(avg_days_to_close) %>% 
 	knitr::kable()
 ```
-
+\newpage
 ### Geographic Analysis
 
 ```{r, include=FALSE}
@@ -272,20 +282,23 @@ data_summary <-
 	spread(topic, prop_topic) %>% 
 	# Join data with census metrics
 	left_join(data_descriptive, by = "geoid") %>% 
-	mutate(avg_num_reqs = total_reqs/pop_tot)
+	mutate(
+		avg_num_reqs = total_reqs/pop_tot,
+		college_educated = ed_grad + ed_bs + ed_as
+	)
 ```
 
 #### Volume of  Calls
 #### =>Relationship Between Race and Volume of Calls
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
-	filter(avg_num_reqs <= find_outlier("avg_num_reqs")) %>% 
+	filter(avg_num_reqs <= find_outlier(avg_num_reqs)) %>% 
 	ggplot(aes(x = pop_wht, y = avg_num_reqs)) +
 	geom_point(alpha = .08) +
 	geom_boxplot(aes(group = cut_width(pop_wht, .1)), alpha = .2) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("avg_num_reqs"),
+		breaks = get_breaks(avg_num_reqs),
     labels = scales::number_format(accuracy = .01)
   ) +
   scale_x_continuous(
@@ -308,7 +321,7 @@ data_summary %>%
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
 	filter(
-		avg_num_reqs <= find_outlier("avg_num_reqs"),
+		avg_num_reqs <= find_outlier(avg_num_reqs),
 		pop_blk <= find_outlier("pop_blk")
 	) %>% 
 	ggplot(aes(x = pop_blk, y = avg_num_reqs)) +
@@ -316,7 +329,7 @@ data_summary %>%
 	geom_boxplot(aes(group = cut_width(pop_blk, .1)), alpha = .2) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("avg_num_reqs"),
+		breaks = get_breaks(avg_num_reqs),
     labels = scales::number_format(accuracy = .01)
   ) +
   scale_x_continuous(
@@ -338,7 +351,7 @@ data_summary %>%
 
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
-	filter(avg_num_reqs <= find_outlier("avg_num_reqs")) %>%
+	filter(avg_num_reqs <= find_outlier(avg_num_reqs)) %>%
 	select(
 		avg_num_reqs, 
 		"White" = pop_wht, 
@@ -352,7 +365,7 @@ data_summary %>%
 	geom_boxplot(aes(group = cut_width(prop, .1)), alpha = .2) +
 	geom_smooth(aes(color = race), method = "loess", se = FALSE) +
 	scale_y_continuous(
-		breaks = get_breaks("avg_num_reqs"),
+		breaks = get_breaks(avg_num_reqs),
     labels = scales::number_format(accuracy = .01)
   ) +
   scale_x_continuous(
@@ -376,12 +389,13 @@ data_summary %>%
 	)
 ```
 
+\newpage
 #### =>Relationship Between Home Value/Rent and Volume of Calls
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
 	filter(
-		avg_num_reqs <= find_outlier("avg_num_reqs"), 
-		med_val <= find_outlier("med_val")
+		avg_num_reqs <= find_outlier(avg_num_reqs), 
+		med_val <= find_outlier(med_val)
 	) %>%
 	ggplot(aes(x = med_val, y = avg_num_reqs)) +
 	geom_point(alpha = .08) +
@@ -391,11 +405,11 @@ data_summary %>%
 	) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("avg_num_reqs"),
+		breaks = get_breaks(avg_num_reqs),
     labels = scales::number_format(accuracy = .01)
   ) +
   scale_x_continuous(
-  	breaks = get_breaks("med_val"),
+  	breaks = get_breaks(med_val),
     labels = scales::comma_format(accuracy = 1000, prefix = "$")
   ) +
 	theme(
@@ -414,8 +428,8 @@ data_summary %>%
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
 	filter(
-		avg_num_reqs <= find_outlier("avg_num_reqs"), 
-		med_ren <= find_outlier("med_ren")
+		avg_num_reqs <= find_outlier(avg_num_reqs), 
+		med_ren <= find_outlier(med_ren)
 	) %>%
 	ggplot(aes(x = med_ren, y = avg_num_reqs)) +
 	geom_point(alpha = .08) +
@@ -425,11 +439,11 @@ data_summary %>%
 	) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("avg_num_reqs"),
+		breaks = get_breaks(avg_num_reqs),
     labels = scales::number_format(accuracy = .01)
   ) +
   scale_x_continuous(
-  	breaks = get_breaks("med_ren"),
+  	breaks = get_breaks(med_ren),
     labels = scales::comma_format(accuracy = 100, prefix = "$")
   ) +
 	theme(
@@ -445,12 +459,12 @@ data_summary %>%
 	)
 ```
 
+\newpage
 #### =>Relationship Between Education and Volume of Calls
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
-	mutate(college_educated = ed_grad + ed_bs + ed_as) %>% 
 	filter(
-		avg_num_reqs <= find_outlier("avg_num_reqs")
+		avg_num_reqs <= find_outlier(avg_num_reqs)
 	) %>%
 	ggplot(aes(x = college_educated, y = avg_num_reqs)) +
 	geom_point(alpha = .08) +
@@ -460,7 +474,7 @@ data_summary %>%
 	) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("avg_num_reqs"),
+		breaks = get_breaks(avg_num_reqs),
     labels = scales::number_format(accuracy = .01)
   ) +
   scale_x_continuous(
@@ -480,12 +494,13 @@ data_summary %>%
 	)
 ```
 
+\newpage
 #### =>Relationship Between Employment and Volume of Calls
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
 	filter(
-		avg_num_reqs <= find_outlier("avg_num_reqs"),
-		emp_une <= find_outlier("emp_une")
+		avg_num_reqs <= find_outlier(avg_num_reqs),
+		emp_une <= find_outlier(emp_une)
 	) %>%
 	ggplot(aes(x = emp_une, y = avg_num_reqs)) +
 	geom_point(alpha = .08) +
@@ -495,7 +510,7 @@ data_summary %>%
 	) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("avg_num_reqs"),
+		breaks = get_breaks(avg_num_reqs),
     labels = scales::number_format(accuracy = .01)
   ) +
   scale_x_continuous(
@@ -515,17 +530,18 @@ data_summary %>%
 	)
 ```
 
+\newpage
 #### Adversarial Calls
 #### =>Relationship Between Race and Adversarial Calls
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
-	filter(prop_adv <= find_outlier("prop_adv")) %>% 
+	filter(prop_adv <= find_outlier(prop_adv)) %>% 
 	ggplot(aes(x = pop_wht, y = prop_adv)) +
 	geom_point(alpha = .08) +
 	geom_boxplot(aes(group = cut_width(pop_wht, .1)), alpha = .2) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("prop_adv"),
+		breaks = get_breaks(prop_adv),
     labels = scales::percent_format(accuracy = 1)
   ) +
   scale_x_continuous(
@@ -547,13 +563,13 @@ data_summary %>%
 
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
-	filter(prop_adv <= find_outlier("prop_adv")) %>% 
+	filter(prop_adv <= find_outlier(prop_adv)) %>% 
 	ggplot(aes(x = pop_nw, y = prop_adv)) +
 	geom_point(alpha = .08) +
 	geom_boxplot(aes(group = cut_width(pop_nw, .1)), alpha = .2) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("prop_adv"),
+		breaks = get_breaks(prop_adv),
     labels = scales::percent_format(accuracy = 1)
   ) +
   scale_x_continuous(
@@ -576,15 +592,15 @@ data_summary %>%
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
 	filter(
-		prop_adv <= find_outlier("prop_adv"),
-		pop_blk <= find_outlier("pop_blk")
+		prop_adv <= find_outlier(prop_adv),
+		pop_blk <= find_outlier(pop_blk)
 	) %>% 
 	ggplot(aes(x = pop_blk, y = prop_adv)) +
 	geom_point(alpha = .08) +
 	geom_boxplot(aes(group = cut_width(pop_blk, .1)), alpha = .2) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("prop_adv"),
+		breaks = get_breaks(prop_adv),
     labels = scales::percent_format(accuracy = 1)
   ) +
   scale_x_continuous(
@@ -606,7 +622,7 @@ data_summary %>%
 
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
-	filter(prop_adv <= find_outlier("prop_adv")) %>% 
+	filter(prop_adv <= find_outlier(prop_adv)) %>% 
 	select(
 		prop_adv, 
 		"White" = pop_wht, 
@@ -620,7 +636,7 @@ data_summary %>%
 	geom_boxplot(aes(group = cut_width(prop, .1)), alpha = .2) +
 	geom_smooth(method = "loess", se = FALSE) +
 	scale_y_continuous(
-		breaks = get_breaks("prop_adv"),
+		breaks = get_breaks(prop_adv),
     labels = scales::percent_format(accuracy = 1)
   ) +
   scale_x_continuous(
@@ -641,12 +657,13 @@ data_summary %>%
 	)
 ```
 
+\newpage
 #### =>Relationship Between Home Value/Rent and Adversarial Calls
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
 	filter(
-		prop_adv <= find_outlier("prop_adv"), 
-		med_val <= find_outlier("med_val")
+		prop_adv <= find_outlier(prop_adv), 
+		med_val <= find_outlier(med_val)
 	) %>%
 	ggplot(aes(x = med_val, y = prop_adv)) +
 	geom_point(alpha = .08) +
@@ -656,11 +673,11 @@ data_summary %>%
 	) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("prop_adv"),
+		breaks = get_breaks(prop_adv),
     labels = scales::percent_format(accuracy = 1)
   ) +
   scale_x_continuous(
-  	breaks = get_breaks("med_val"),
+  	breaks = get_breaks(med_val),
     labels = scales::comma_format(accuracy = 1000, prefix = "$")
   ) +
 	theme(
@@ -679,8 +696,8 @@ data_summary %>%
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
 	filter(
-		prop_adv <= find_outlier("prop_adv"), 
-		med_ren <= find_outlier("med_ren")
+		prop_adv <= find_outlier(prop_adv), 
+		med_ren <= find_outlier(med_ren)
 	) %>%
 	ggplot(aes(x = med_ren, y = prop_adv)) +
 	geom_point(alpha = .08) +
@@ -690,11 +707,11 @@ data_summary %>%
 	) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("prop_adv"),
+		breaks = get_breaks(prop_adv),
     labels = scales::percent_format(accuracy = 1)
   ) +
   scale_x_continuous(
-  	breaks = get_breaks("med_ren"),
+  	breaks = get_breaks(med_ren),
     labels = scales::comma_format(accuracy = 100, prefix = "$")
   ) +
 	theme(
@@ -710,12 +727,13 @@ data_summary %>%
 	)
 ```
 
+\newpage
 #### =>Relationship Between Education and Adversarial Calls
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
 	mutate(college_educated = ed_grad + ed_bs + ed_as) %>% 
 	filter(
-		prop_adv <= find_outlier("prop_adv")
+		prop_adv <= find_outlier(prop_adv)
 	) %>%
 	ggplot(aes(x = college_educated, y = prop_adv)) +
 	geom_point(alpha = .08) +
@@ -725,7 +743,7 @@ data_summary %>%
 	) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("prop_adv"),
+		breaks = get_breaks(prop_adv),
     labels = scales::percent_format(accuracy = 1)
   ) +
   scale_x_continuous(
@@ -745,12 +763,13 @@ data_summary %>%
 	)
 ```
 
+\newpage
 #### =>Relationship Between Employment and Adversarial Calls
 ```{r, echo=FALSE, warning=FALSE}
 data_summary %>% 
 	filter(
-		prop_adv <= find_outlier("prop_adv"),
-		emp_une <= find_outlier("emp_une")
+		prop_adv <= find_outlier(prop_adv),
+		emp_une <= find_outlier(emp_une)
 	) %>%
 	ggplot(aes(x = emp_une, y = prop_adv)) +
 	geom_point(alpha = .08) +
@@ -760,7 +779,7 @@ data_summary %>%
 	) +
 	geom_smooth(method = "loess", se = FALSE, color = "maroon") +
 	scale_y_continuous(
-		breaks = get_breaks("prop_adv"),
+		breaks = get_breaks(prop_adv),
     labels = scales::percent_format(accuracy = 1)
   ) +
   scale_x_continuous(
@@ -780,5 +799,259 @@ data_summary %>%
 	)
 ```
 
+\newpage
 ### Mapping
+```{r, include=FALSE}
+# Filters out tracts that are not really part of the areas we are looking at
+data_summary <-
+	data_summary %>% 
+	filter(!(geoid %in% c("06041131100", "06075017902", "25017341902", "25025990101")))
+```
 
+#### Mapping Demographics
+#### =>Population Density
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+make_map(
+	metric = pop_tot,
+	metric_type = "number", 
+	map_title = paste0("Total Population in ", get_full_city_name()), 
+	legend_title = "Total Population in A Given Census Tract"
+)
+```
+
+\newpage
+#### =>Mapping Number of Calls
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_calls <-
+	make_map(
+		metric = avg_num_reqs,
+		metric_type = "number", 
+		map_title = paste0("Average Number of Requests\nper Person in ", get_full_city_name()), 
+		legend_title = "Average Number of Request per Person"
+	)
+
+map_calls
+```
+
+\newpage
+#### =>Mapping Race
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_white <-
+	make_map(
+		metric = pop_wht,
+		metric_type = "percent", 
+		map_title = paste0("Proportion of the Population\nWhite Alone (Non-Hispanic) in ", get_full_city_name()), 
+		legend_title = "% of Population"
+	)
+
+map_white
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_nw <-
+	make_map(
+		metric = pop_nw,
+		metric_type = "percent", 
+		map_title = paste0("Proportion of the Population\n Non-White in ", get_full_city_name()), 
+		legend_title = "% of Population"
+	)
+
+map_nw
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_his <-
+	make_map(
+		metric = pop_his,
+		metric_type = "percent", 
+		map_title = paste0("Proportion of the Population\n Hispanic in ", get_full_city_name()), 
+		legend_title = "% of Population"
+	)
+
+map_his
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_aa <- 
+	make_map(
+		metric = pop_blk,
+		metric_type = "percent", 
+		map_title = 
+			paste0("Proportion of the Population\nAfrican American in ", get_full_city_name()), 
+		legend_title = "% of Population"
+	)
+
+map_aa
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_asian <-
+	make_map(
+		metric = pop_asi,
+		metric_type = "percent", 
+		map_title = paste0("Proportion of the Population\nAsian in ", get_full_city_name()), 
+		legend_title = "% of Population"
+	)
+
+map_asian
+```
+
+\newpage
+#### =>Mapping Rent
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_rent <- 
+	make_map(
+		metric = med_ren,
+		rev_scale = "higher is better",
+		metric_type = "rent", 
+		map_title = paste0("Median Rent in ", get_full_city_name()), 
+		legend_title = "Median Rent ($)"
+	)
+
+map_rent
+```
+
+\newpage
+#### =>Mapping Education
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_ed <- 
+	make_map(
+		metric = college_educated,
+		rev_scale = "higher is better",
+		metric_type = "percent", 
+		map_title = paste0("% of Population College Educated\nin ", get_full_city_name()), 
+		legend_title = "% of Population College Educated"
+	)
+
+map_ed
+```
+
+\newpage
+#### =>Mapping Income
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_income <- 
+	make_map(
+		metric = med_inc,
+		rev_scale = "higher is better",
+		metric_type = "value", 
+		map_title = paste0("Median Income in ", get_full_city_name()), 
+		legend_title = "Median Income ($)"
+	)
+
+map_income
+```
+
+\newpage
+#### Mapping 311 Requests
+#### =>Mapping Adversarial Requests
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_adv <- 
+	make_map(
+		metric = prop_adv,
+		metric_type = "percent", 
+		map_title = paste0("% Adversarial 311 Requests in\n", get_full_city_name()), 
+		legend_title = "% of 311 Request Designated Adversarial"
+	)
+
+map_adv
+```
+
+\newpage
+#### =>Mapping Requests Regarding Potentially Illegal Activities
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_ill <- 
+	make_map(
+		metric = prop_illegal,
+		metric_type = "percent", 
+		map_title = 
+			paste0("% 311 Requests Pertaining to Potentially\nIllegal Activities in ", get_full_city_name()), 
+		legend_title = "% of 311 Requests Regarding Potentially Illegal Activity"
+	)
+
+map_ill
+```
+
+\newpage
+#### =>Mapping Requests Regarding Housing and Homeless Issues
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+if (data_city != "BOS") {
+	map_house <- 
+		make_map(
+			metric = housing,
+			metric_type = "percent", 
+			map_title = 
+				paste0("% 311 Requests Regarding\nHousing/HomelessIssues in ", get_full_city_name()), 
+			legend_title = "% of 311 Requests"
+		)
+
+	map_house
+}
+```
+
+\newpage
+#### =>Mapping Requests Regarding Abandoned Property
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_abandoned <- 
+	make_map(
+		metric = `abandoned bike/vehicle`,
+		metric_type = "percent", 
+		map_title = 
+			paste0("% 311 Requests Regarding Abandoned\nBikes/Vehicles in ", get_full_city_name()), 
+		legend_title = "% of 311 Requests"
+	)
+
+map_abandoned
+```
+
+\newpage
+#### =>Mapping Requests Regarding Graffiti
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_graffiti <- 
+	make_map(
+		metric = graffiti,
+		metric_type = "percent", 
+		map_title = 
+			paste0("% 311 Requests Regarding Graffiti\nin ", get_full_city_name()), 
+		legend_title = "% of 311 Requests"
+	)
+
+map_graffiti
+```
+
+\newpage
+#### =>Mapping Requests Regarding Noise
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+map_noise <- 
+	make_map(
+		metric = noise,
+		metric_type = "percent", 
+		map_title = 
+			paste0("% 311 Requests Regarding Noise\nin ", get_full_city_name()), 
+		legend_title = "% of 311 Requests"
+	)
+
+map_noise
+```
+
+\newpage
+#### High Level View
+#### => Mapping Racial Diversity
+```{r, echo=FALSE, warning=FALSE, fig.width=15, fig.height=10, message=FALSE}
+map_calls + map_white + map_aa + map_his + plot_layout()
+```
+
+\newpage
+#### =>Mapping Demographic Composition
+```{r, echo=FALSE, warning=FALSE, fig.width=15, fig.height=10, message=FALSE}
+map_white + map_income + map_ed + map_rent + plot_layout()
+```
+
+\newpage
+#### => Mapping Composition of Adversarial Requests
+```{r, echo=FALSE, warning=FALSE, fig.width=15, fig.height=10, message=FALSE}
+if (data_city != "BOS") {
+	map_graffiti + map_noise + map_house + map_abandoned + plot_layout()
+} else {
+	map_graffiti + map_noise + map_abandoned + plot_layout(ncol = 2)
+}
+```
