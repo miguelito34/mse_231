@@ -980,7 +980,7 @@ if (data_city != "BOS") {
 			metric = housing,
 			metric_type = "percent", 
 			map_title = 
-				paste0("% 311 Requests Regarding\nHousing/HomelessIssues in ", get_full_city_name()), 
+				paste0("% 311 Requests Regarding\nHousing/Homeless Issues in ", get_full_city_name()), 
 			legend_title = "% of 311 Requests"
 		)
 
