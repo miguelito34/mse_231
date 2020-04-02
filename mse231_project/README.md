@@ -3,7 +3,7 @@
 ### Overview
 We will analyze 311 calls to answer the following question: do we see a higher volume of disturbance or conflict-centered 311 requests in city neighborhoods associated with and high proportions of people of color?
 
-You can view the [paper here](https://drive.google.com/file/d/1M8nayXOpmcXnJINeLrs7jtGbElALSOTH/view?usp=sharing) and a [presentation deck here](https://docs.google.com/presentation/d/1UADt5oMQJgzIxVausspY_xRfqnD7exqxRPzdYU5kzrw/edit?usp=sharing).
+You can view the [paper here](https://drive.google.com/file/d/1M8nayXOpmcXnJINeLrs7jtGbElALSOTH/view?usp=sharing) and a [presentation deck here](https://drive.google.com/file/d/1hN7i1JjtDLEY6RTVzPVFtlNxGxnjSd-0/view?usp=sharing).
 
 ### Getting Set Up
 
