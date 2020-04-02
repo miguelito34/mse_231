@@ -3,6 +3,8 @@
 ### Overview
 We will analyze 311 calls to answer the following question: do we see a higher volume of disturbance or conflict-centered 311 requests in city neighborhoods associated with and high proportions of people of color?
 
+You can view the [paper here](https://drive.google.com/file/d/1M8nayXOpmcXnJINeLrs7jtGbElALSOTH/view?usp=sharing) and a [presentation deck here](https://docs.google.com/presentation/d/1UADt5oMQJgzIxVausspY_xRfqnD7exqxRPzdYU5kzrw/edit?usp=sharing).
+
 ### Getting Set Up
 
 1. Folder Structure
@@ -93,6 +95,7 @@ Current options for analysis are:
 
 * San Francisco - "SFO"
 * Chicago - "CHI"
+* Boston - "BOS"
 
 ```
 python3 scripts/311/get_census_tract_batch.py <city abb>
@@ -112,9 +115,3 @@ bash render_report.sh CHI no
 ```
 
 To perform your own analysis, you can start with the template at `analysis/template_exploratory_analysis.Rmd` by opening it in RStudio. The code already written will load the neccessary packages to read in and clean the data for analysis. Some of the data is pulled from a google sheet that the team maintains. Upon running the script, you may be asked to authenticate your google account. Doing so gives the `googlesheets4` package, which is used to pull the data, permission to access the sheet. Please follow the instructions.
-
-### Approach and Strategy (To Come)
-
-### Results (To Come)
-
-### Conclusions and Limitations (To Come)
